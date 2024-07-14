@@ -19,3 +19,4 @@ Route::get('/', function () {
 });
 
 Route::get('create_plat',[PlatController::class,'create_plat']);
+Route::post('store_plat',[PlatController::class,'store_plat']);

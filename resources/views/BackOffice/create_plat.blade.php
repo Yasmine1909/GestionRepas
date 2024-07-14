@@ -6,7 +6,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center text-secondary mb-4">Créer un Plat</h1>
-            <form action="" method="post" class="form-group" enctype="multipart/form-data">
+            <form action="/store_plat" method="post" class="form-group" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
