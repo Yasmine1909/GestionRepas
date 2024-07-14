@@ -1,0 +1,86 @@
+@charset "UTF-8";
+/* Styles généraux */
+body {
+  font-family: "Arial", sans-serif;
+}
+
+/* Styles spécifiques pour FullCalendar */
+.fc-toolbar {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 10px;
+}
+
+.fc-button {
+  background-color: #f76c6c;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.fc-button:hover {
+  background-color: #e85a5a;
+}
+
+.fc-button-primary:not(:disabled).fc-button-active,
+.fc-button-primary:not(:disabled):active {
+  background-color: #e85a5a;
+  border-color: #e85a5a;
+}
+
+.fc-daygrid-day-number {
+  color: #6c757d;
+}
+
+.fc-daygrid-event {
+  background-color: #f76c6c;
+  border: 1px solid #f76c6c;
+  color: rgb(111, 24, 24);
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.fc-daygrid-event:hover {
+  background-color: #e85a5a;
+  border-color: #e85a5a;
+}
+
+.fc {
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fc-daygrid-day {
+  border: 1px solid #dee2e6;
+  background-color: #fff555;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #f1f1f1;
+}
+
+.fc-toolbar-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #343a40;
+}
+
+.fc-prev-button,
+.fc-next-button,
+.fc-today-button {
+  background-color: #f76c6c;
+  color: white;
+}
+
+.fc-prev-button:hover,
+.fc-next-button:hover,
+.fc-today-button:hover {
+  background-color: #e85a5a;
+}
+
+.fc-button-group .fc-button {
+  margin-right: 5px;
+}
+
