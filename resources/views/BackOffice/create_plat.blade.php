@@ -5,7 +5,7 @@
 <div class="container" style="margin-bottom:10%;margin-top:10%;">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h1 class="text-center text-secondary mb-4">Créer un Plat</h1>
+            <h1 class="text-center text-secondary mb-4">Ajouter un Plat</h1>
             <form action="/store_plat" method="post" class="form-group" enctype="multipart/form-data">
                 @csrf
 

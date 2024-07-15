@@ -22,15 +22,16 @@ class PlatController extends Controller
         ]);
 
         $imageName = time().'.'.$req->photo->extension();
-        $req->photo->move(public_path('images'), $imageName);
+        $req->photo->storeAs('public/images', $imageName);
 
         $plat = new Plat();
         $plat->titre = $req->titre;
         $plat->ingredients = $req->ingredients;
-        $plat->photo = $imageName;
+        $plat->photo = 'images/' . $imageName;
         $plat->type = $req->type;
         $plat->save();
 
         return redirect()->back()->with('success', 'Plat créé avec succès!');
     }
+
 }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\PlatController;
+use App\Http\Controllers\ShowController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,9 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('FrontOffice.welcome');
-});
+Route::get('/',[ShowController::class,'show']);
+Route::get('menu',[ShowController::class,'menu']);
 
 Route::get('create_plat',[PlatController::class,'create_plat']);
 Route::post('store_plat',[PlatController::class,'store_plat']);
