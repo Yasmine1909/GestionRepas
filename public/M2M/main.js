@@ -36,7 +36,7 @@
   }
 
   /**
-   * Easy on scroll event listener 
+   * Easy on scroll event listener
    */
   const onscroll = (el, listener) => {
     el.addEventListener('scroll', listener)
@@ -79,25 +79,25 @@
   /**
    * Toggle .header-scrolled class to #header when page is scrolled
    */
-  let selectHeader = select('#header')
-  let selectTopbar = select('#topbar')
-  if (selectHeader) {
-    const headerScrolled = () => {
-      if (window.scrollY > 100) {
-        selectHeader.classList.add('header-scrolled')
-        if (selectTopbar) {
-          selectTopbar.classList.add('topbar-scrolled')
-        }
-      } else {
-        selectHeader.classList.remove('header-scrolled')
-        if (selectTopbar) {
-          selectTopbar.classList.remove('topbar-scrolled')
-        }
-      }
-    }
-    window.addEventListener('load', headerScrolled)
-    onscroll(document, headerScrolled)
-  }
+//   let selectHeader = select('#header')
+//   let selectTopbar = select('#topbar')
+//   if (selectHeader) {
+//     const headerScrolled = () => {
+//       if (window.scrollY > 100) {
+//         selectHeader.classList.add('header-scrolled')
+//         if (selectTopbar) {
+//           selectTopbar.classList.add('topbar-scrolled')
+//         }
+//       } else {
+//         selectHeader.classList.remove('header-scrolled')
+//         if (selectTopbar) {
+//           selectTopbar.classList.remove('topbar-scrolled')
+//         }
+//       }
+//     }
+//     window.addEventListener('load', headerScrolled)
+//     onscroll(document, headerScrolled)
+//   }
 
   /**
    * Back to top button
@@ -223,14 +223,14 @@
   });
 
   /**
-   * Initiate gallery lightbox 
+   * Initiate gallery lightbox
    */
   const galleryLightbox = GLightbox({
     selector: '.gallery-lightbox'
   });
 
   /**
-   * Initiate GLightbox 
+   * Initiate GLightbox
    */
   GLightbox({
     selector: '.glightbox'

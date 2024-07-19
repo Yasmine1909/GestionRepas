@@ -18,4 +18,22 @@ class ShowController extends Controller
 
         return view('FrontOffice.menu', compact('entrees', 'plats', 'desserts'));
     }
+    public function connexion(){
+        return view('FrontOffice.connexion');
+    }
+    public function ajouter_menu(){
+        return view('FrontOffice.ajouter_menu');
+    }
+    public function menus(){
+        return view('FrontOffice.menus');
+    }
+    public function modifier_menu(){
+        return view('FrontOffice.modifier_menu');
+    }
+    public function notifications(){
+        return view('FrontOffice.notifications');
+    }
+    public function dashboard(){
+        return view('FrontOffice.dashboard');
+    }
 }

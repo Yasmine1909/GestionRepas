@@ -51,9 +51,9 @@
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
 
-          <li><a class="nav-link scrollto" href="Dashboard">Dashboard </a></li>
-          <li><a class="nav-link scrollto" href="notifications">Notifications</a></li>
-        </ul>
+          <li><a class="nav-link scrollto" href="ajouter_menu">Ajouter Menu </a></li>
+          <li><a class="nav-link scrollto" href="menus">Consulter  </a></li>
+
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
 

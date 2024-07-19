@@ -1,121 +1,167 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('FrontOffice/layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>M2M</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
+@section('content')
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,600,600i,700,700i|Satisfy|Comic+Neue:300,300i,400,400i,700,700i" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
-    <!-- Vendor CSS Files -->
-    <link href="{{ asset('M2M/vendor/animate.css/animate.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('M2M/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('M2M/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('M2M/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('M2M/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('M2M/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+<style>
+    .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        max-width: 700px; /* Adjust the width as needed */
+        margin: auto;
+    }
+    .calendar div {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        background-color: #ffffff;
+    }
+    .calendar .header {
+        background-color: #007bff;
+        color: #ffffff;
+        font-weight: bold;
+    }
+    .calendar .weekend {
+        background-color: #e9ecef;
+    }
+    .calendar .disabled {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+    .calendar .clickable {
+        cursor: pointer;
+    }
+    .calendar .clickable:hover {
+        background-color: #e0a800;
+        color: #ffffff;
+    }
+    .calendar .available {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+    .calendar .available:hover {
+        background-color: #0056b3;
+    }
+    .calendar .reserved {
+        background-color: #dc3545;
+        color: #ffffff;
+    }
+    .calendar .reserved:hover {
+        background-color: #c82333;
+    }
+    .modal-body {
+        padding: 1rem;
+    }
+</style>
 
-    <!-- Template Main CSS File -->
-    <link href="{{ asset('M2M/style.css') }}" rel="stylesheet">
-</head>
+<div class="container " style="margin-top: 10%;margin-bottom:5%;">
+    <h1 class="text-center mb-4">Réservations de Repas</h1>
+    <div class="calendar">
+        <!-- Headers for days of the week -->
+        <div class="header">Lun</div>
+        <div class="header">Mar</div>
+        <div class="header">Mer</div>
+        <div class="header">Jeu</div>
+        <div class="header">Ven</div>
+        <div class="header">Sam</div>
+        <div class="header">Dim</div>
 
-<body>
-    <header id="header" class="fixed-top d-flex align-items-center header-transparent">
-        <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-            <div class="logo me-auto">
-                <h1><a href="{{ url('/') }}">M2M</a></h1>
+        <!-- Example static days for July 2024 (this should be dynamically generated in a real application) -->
+        <!-- Adjust dates and classes according to the month and week you want to display -->
+        <div class="disabled">01</div>
+        <div class="disabled">02</div>
+        <div class="disabled">03</div>
+        <div class="disabled">04</div>
+        <div class="disabled">05</div>
+        <div class="weekend">06</div>
+        <div class="weekend">07</div>
+
+        <div class="clickable">08</div>
+        <div class="clickable">09</div>
+        <div class="clickable">10</div>
+        <div class="clickable">11</div>
+        <div class="clickable">12</div>
+        <div class="weekend">13</div>
+        <div class="weekend">14</div>
+
+        <div class="clickable">15</div>
+        <div class="clickable">16</div>
+        <div class="clickable">17</div>
+        <div class="clickable">18</div>
+        <div class="clickable">19</div>
+        <div class="weekend">20</div>
+        <div class="weekend">21</div>
+
+        <div class="clickable available">22</div>
+        <div class="clickable available">23</div>
+        <div class="clickable reserved" data-toggle="modal" data-target="#menuModal">24</div>
+        <div class="clickable available">25</div>
+        <div class="clickable available">26</div>
+        <div class="weekend">27</div>
+        <div class="weekend">28</div>
+
+        <div class="clickable">29</div>
+        <div class="clickable">30</div>
+        <div class="clickable">31</div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<!-- Modal for displaying menu -->
+<div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="menuModalLabel">Menu du Jour</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <nav id="navbar" class="navbar order-last order-lg-0">
-                <ul>
-                    <li><a class="nav-link scrollto" href="#about">Réservation </a></li>
-                    <li><a class="nav-link scrollto" href="#menu">Menu</a></li>
-                    <li><a class="nav-link scrollto" href="#specials">Mes Notifications</a></li>
-                    <li><a class="nav-link scrollto" href="#events">Contact</a></li>
-                </ul>
-                <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-
-            <a href="#book-a-table" class="book-a-table-btn scrollto">Déconnexion</a>
-
+            <div class="modal-body">
+                <p><strong>Date:</strong> <span id="menuDate">24-07-2024</span></p>
+                <p><strong>Entrée:</strong> Soupe à l'oignon</p>
+                <p><strong>Plat Principal:</strong> Coq au Vin</p>
+                <p><strong>Dessert:</strong> Mousse au Chocolat</p>
+                <p><strong>Status:</strong> <span id="reservationStatus">Réservé</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="reserveButton" style="display: none;">Réserver</button>
+                <button type="button" class="btn btn-danger" id="cancelButton" style="display: none;">Annuler Réservation</button>
+            </div>
         </div>
-    </header><!-- End Header -->
+    </div>
+</div>
 
-    <div id="calendar" style="margin-right: 20%; margin-left: 20%; margin-bottom: 10%; margin-top: 15%;"></div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cells = document.querySelectorAll('.calendar .clickable');
 
-    <!-- Inclure les fichiers JavaScript de FullCalendar -->
-    <script src="{{ mix('js/fullcalendar.js') }}"></script>
+    cells.forEach(cell => {
+        const date = cell.textContent;
+        const isReserved = cell.classList.contains('reserved');
+        const isAvailable = cell.classList.contains('available');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: ['dayGrid', 'timeGrid'],
-                initialView: 'dayGridMonth', // Vue initiale par défaut
-
-                eventClassNames: 'custom-event', // Classe CSS globale pour tous les événements
-                eventContent: function(arg) {
-                    // Fonction pour personnaliser le contenu et les styles de chaque événement
-                    return {
-                        html: '<b>' + arg.timeText + '</b><br/>' + arg.event.title,
-                        classList: ['custom-event'], // Classes CSS supplémentaires si nécessaires
-                        backgroundColor: '#ffffff', // Couleur de fond
-                        borderColor: '#2e6da4', // Couleur de la bordure
-                        textColor: '#000000' // Couleur du texte
-                    };
-                },
-
-                
-            });
-
-            calendar.render();
+        cell.addEventListener('click', () => {
+            if (isAvailable || isReserved) {
+                const dateString = `2024-07-${date.padStart(2, '0')}`;
+                document.getElementById('menuDate').textContent = dateString;
+                document.getElementById('reservationStatus').textContent = isReserved ? 'Réservé' : 'Réservable';
+                document.getElementById('reserveButton').style.display = isReserved ? 'none' : 'block';
+                document.getElementById('cancelButton').style.display = isReserved ? 'block' : 'none';
+                $('#menuModal').modal('show');
+            }
         });
-    </script>
+    });
+});
+</script>
 
-    <footer id="footer">
-        <div class="container">
-            <h3>M2M</h3>
-            <p>Bienvenue sur M2M - Votre Solution de Réservation de Repas en Ligne</p>
-            <div class="social-links">
-                <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-                <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-                <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-                <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-                <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-            </div>
-
-        </div>
-    </footer><!-- End Footer -->
-
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-    <!-- Vendor JS Files -->
-
-    <!-- Styles -->
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-    <!-- Scripts -->
-    <script src="{{ mix('js/app.js') }}"></script>
-    <script src="{{ asset('M2M/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('M2M/vendor/glightbox/js/glightbox.min.js') }}"></script>
-    <script src="{{ asset('M2M/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
-    <script src="{{ asset('M2M/vendor/swiper/swiper-bundle.min.js') }}"></script>
-    <script src="{{ asset('M2M/vendor/php-email-form/validate.js') }}"></script>
-
-    <!-- Template Main JS File -->
-    <script src="{{ asset('M2M/main.js') }}"></script>
-    <script src="{{ asset('M2M/dashboard.js') }}"></script>
-
-    <!-- Inclure les fichiers JavaScript de FullCalendar -->
-    <script src="{{ asset('node_modules/@fullcalendar/core/main.js') }}"></script>
-    <script src="{{ asset('node_modules/@fullcalendar/daygrid/main.js') }}"></script>
-    <script src="{{ asset('node_modules/@fullcalendar/timegrid/main.js') }}"></script>
-
-    <!-- Inclure votre script personnalisé -->
-
-</body>
-
-</html>
+@endsection

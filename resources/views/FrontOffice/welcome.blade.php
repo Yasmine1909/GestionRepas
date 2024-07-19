@@ -20,8 +20,7 @@
                   <div class="carousel-content">
                     <h2 class="animate__animated animate__fadeInDown"><span>Réservez vos repas pour la semaine à venir</span> </h2>
                     <div>
-                      <a href="#menu" class="btn-menu animate__animated animate__fadeInUp scrollto">Notre Menu</a>
-                      <a href="#book-a-table" class="btn-book animate__animated animate__fadeInUp scrollto">Réservez</a>
+                      <a href="Dashboard" class="btn-book animate__animated animate__fadeInUp scrollto">Réservez</a>
                     </div>
                   </div>
                 </div>
