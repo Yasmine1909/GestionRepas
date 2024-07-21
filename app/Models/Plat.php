@@ -8,10 +8,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Plat extends Model
 {
-    use HasFactory,SoftDeletes;
-    protected $fillable = ['titre', 'ingredients', 'photo', 'type'];
-
-    protected $casts = [
-        'type' => 'string',
-    ];
+    protected $fillable = ['jour_id', 'titre'];
 }

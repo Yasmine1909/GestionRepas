@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PlatController;
 use App\Http\Controllers\ShowController;
+use App\Http\Controllers\MenuController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -19,11 +20,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/',[ShowController::class,'show']);
 Route::get('menu',[ShowController::class,'menu']);
 Route::get('connexion',[ShowController::class,'connexion']);
-Route::get('ajouter_menu',[ShowController::class,'ajouter_menu']);
 Route::get('menus',[ShowController::class,'menus']);
 Route::get('modifier_menu',[ShowController::class,'modifier_menu']);
 Route::get('notifications',[ShowController::class,'notifications']);
 Route::get('Dashboard',[ShowController::class,'dashboard']);
 
-Route::get('create_plat',[PlatController::class,'create_plat']);
-Route::post('store_plat',[PlatController::class,'store_plat']);
+// Afficher le formulaire de configuration des menus
+Route::get('ajouter_menu', [MenuController::class, 'ajouter_menu'])->name('ajouter_menu');
+
+// Gérer la soumission du formulaire de configuration des menus
+Route::post('store', [MenuController::class, 'store'])->name('store');

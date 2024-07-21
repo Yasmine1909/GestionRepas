@@ -21,9 +21,7 @@ class ShowController extends Controller
     public function connexion(){
         return view('FrontOffice.connexion');
     }
-    public function ajouter_menu(){
-        return view('FrontOffice.ajouter_menu');
-    }
+  
     public function menus(){
         return view('FrontOffice.menus');
     }
