@@ -9,4 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Plat extends Model
 {
     protected $fillable = ['jour_id', 'titre'];
+    public function jour()
+    {
+        return $this->belongsTo(Jour::class, 'jour_id');
+    }
 }

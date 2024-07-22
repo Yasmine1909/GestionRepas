@@ -13,4 +13,8 @@ class Jour extends Model
     {
         return $this->hasMany(Plat::class);
     }
+    public function semaine()
+    {
+        return $this->belongsTo(Semaine::class, 'semaine_id');
+    }
 }

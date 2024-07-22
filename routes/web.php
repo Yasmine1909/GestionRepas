@@ -21,7 +21,21 @@ Route::get('/',[ShowController::class,'show']);
 Route::get('menu',[ShowController::class,'menu']);
 Route::get('connexion',[ShowController::class,'connexion']);
 Route::get('menus',[ShowController::class,'menus']);
-Route::get('modifier_menu',[ShowController::class,'modifier_menu']);
+
+
+
+
+// Route pour afficher le formulaire de modification
+Route::get('modifier_menu/{id}', [ShowController::class, 'modifier_menu'])->name('modifier_menu');
+
+// Route pour mettre à jour les données du menu
+Route::put('update/{id}', [ShowController::class, 'update'])->name('update');
+
+
+// Route pour supprimer un plat
+Route::delete('supprimer_menu/{id}', [ShowController::class, 'destroy'])->name('destroy');
+
+
 Route::get('notifications',[ShowController::class,'notifications']);
 Route::get('Dashboard',[ShowController::class,'dashboard']);
 
