@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePlatsTable extends Migration
+class CreateActiveDaysConfigurationTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,10 @@ class CreatePlatsTable extends Migration
      */
     public function up()
     {
-        Schema::create('plats', function (Blueprint $table) {
+        Schema::create('active_days_configuration', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('jour_id');
-            $table->string('titre');
+            $table->json('active_days');
             $table->timestamps();
-
-            // Define foreign key constraint
-            $table->foreign('jour_id')->references('id')->on('jours')->onDelete('cascade');
         });
     }
 
@@ -31,6 +27,6 @@ class CreatePlatsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plats');
+        Schema::dropIfExists('active_days_configuration');
     }
 }

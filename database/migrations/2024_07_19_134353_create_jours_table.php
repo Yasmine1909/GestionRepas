@@ -17,6 +17,7 @@ class CreateJoursTable extends Migration
             $table->id();
             $table->foreignId('semaine_id')->constrained()->onDelete('cascade');
             $table->enum('jour', ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']);
+            $table->date('date'); // Ajout de la colonne 'date'
             $table->timestamps();
         });
     }

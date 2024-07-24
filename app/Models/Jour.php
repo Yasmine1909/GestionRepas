@@ -7,14 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Jour extends Model
 {
-    protected $fillable = ['semaine_id', 'jour'];
+    use HasFactory;
 
+    protected $fillable = ['semaine_id', 'date', 'jour']; // Assurez-vous que 'date' est inclus
+    public function semaine()
+    {
+        return $this->belongsTo(Semaine::class);
+    }
     public function plats()
     {
         return $this->hasMany(Plat::class);
-    }
-    public function semaine()
-    {
-        return $this->belongsTo(Semaine::class, 'semaine_id');
     }
 }

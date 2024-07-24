@@ -39,7 +39,7 @@
 <body>
 
   <!-- ======= Header ======= -->
-  <header id="header" class="fixed-top d-flex align-items-center  topbar-scrolled" style="background-color: #35322d;">
+  <header id="header" class="fixed-top d-flex align-items-center  topbar-scrolled" style="background-color: #0d4a75;">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <div class="logo me-auto">

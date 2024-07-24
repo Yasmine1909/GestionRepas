@@ -39,7 +39,7 @@
 <body>
 
   <!-- ======= Header ======= -->
-  <header id="header" class="fixed-top d-flex align-items-center  topbar-scrolled" style="background-color: #35322d;">
+  <header id="header" class="fixed-top d-flex align-items-center  topbar-scrolled" style="background-color:  #0d4a75;">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <div class="logo me-auto">
@@ -50,9 +50,10 @@
 
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
+            <li><a class="nav-link scrollto" href="/admin/active-days-configuration">Configuration   </a></li>
+            <li><a class="nav-link scrollto" href="/admin/ajouter-menu">Ajout Des Plats  </a></li>
+          <li><a class="nav-link scrollto" href="/menus">Consultation  </a></li>
 
-          <li><a class="nav-link scrollto" href="ajouter_menu">Ajouter Menu </a></li>
-          <li><a class="nav-link scrollto" href="menus">Consulter  </a></li>
 
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
