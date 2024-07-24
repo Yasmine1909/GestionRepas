@@ -1,19 +1,17 @@
-@extends('FrontOffice/layouts.app')
-
+@extends('FrontOffice.layouts.app')
 
 @section('content')
-
 
 <div class="container" style="margin-bottom:10%;margin-top:15%;">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center text-secondary mb-4">Connexion au Compte</h1>
-            <form action="" method="post" class="form-group" enctype="multipart/form-data">
+            <form action="{{ route('login') }}" method="post" class="form-group" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Entrez Votre Email" required>
+                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Entrez Votre Nom d'utilisateur" required>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Mot de Passe</label>
@@ -37,8 +35,5 @@
         </div>
     </div>
 </div>
-
-
-
 
 @endsection
