@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDateToJoursTable extends Migration
+class AddDateColumnToJoursTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +14,9 @@ class AddDateToJoursTable extends Migration
     public function up()
     {
         Schema::table('jours', function (Blueprint $table) {
-            $table->date('date')->after('semaine_id'); // Ajouter la colonne 'date' après la colonne 'semaine_id'
+            $table->date('date')->nullable()->after('semaine_id'); // Ajouter la colonne 'date' nullable
         });
     }
-
 
     /**
      * Reverse the migrations.
@@ -27,7 +26,7 @@ class AddDateToJoursTable extends Migration
     public function down()
     {
         Schema::table('jours', function (Blueprint $table) {
-            $table->dropColumn('date'); // Supprimer la colonne 'date'
+            $table->dropColumn('date');
         });
     }
 }
