@@ -39,7 +39,11 @@
 <body>
 
   <!-- ======= Header ======= -->
+<<<<<<< HEAD
   <header id="header" class="fixed-top d-flex align-items-center topbar-scrolled" style="background-color: #35322d;">
+=======
+  <header id="header" class="fixed-top d-flex align-items-center  topbar-scrolled" style="background-color: #0d4a75;">
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <div class="logo me-auto">
@@ -50,23 +54,36 @@
 
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
+<<<<<<< HEAD
           <li><a class="nav-link scrollto" href="Dashboard">Dashboard</a></li>
+=======
+
+          <li><a class="nav-link scrollto" href="Dashboard">Dashboard </a></li>
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
           <li><a class="nav-link scrollto" href="notifications">Notifications</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
 
+<<<<<<< HEAD
       <!-- Logout Form -->
       <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: inline;">
         @csrf
         <button type="submit" class="book-a-table-btn scrollto">Déconnexion</button>
       </form>
+=======
+      <a href="#book-a-table" class="book-a-table-btn scrollto">Déconnexion</a>
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
 
     </div>
   </header><!-- End Header -->
 
+<<<<<<< HEAD
   @yield('content')
 
+=======
+        @yield('content')
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
  <!-- ======= Footer ======= -->
  <footer id="footer">
     <div class="container">
@@ -79,10 +96,15 @@
         <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
         <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
       </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
     </div>
   </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+<<<<<<< HEAD
 
 <!-- Vendor JS Files -->
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -107,3 +129,30 @@
 
 </body>
 </html>
+=======
+<!-- Vendor JS Files -->
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('M2M/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('M2M/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset('M2M/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ asset('M2M/vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ asset('M2M/vendor/php-email-form/validate.js') }}"></script>
+
+    <!-- Template Main JS File -->
+    <script src="{{ asset('M2M/main.js') }}"></script>
+    <script src="{{ asset('M2M/main2.js') }}"></script>
+    <script src="{{asset('M2M/lib/wow/wow.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/easing/easing.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/waypoints/waypoints.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/counterup/counterup.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/owlcarousel/owl.carousel.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/tempusdominus/js/moment.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/tempusdominus/js/moment-timezone.min.js')}}"></script>
+    <script src="{{asset('M2M/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js')}}"></script>
+
+    </body>
+
+    </html>
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8

@@ -30,9 +30,36 @@
         @endphp
 
         <div class="week-container" data-week-start="{{ $weekStart->format('Y-m-d') }}">
+<<<<<<< HEAD
             <div class="week-title">
                 Semaine du {{ $weekStart->format('d M Y') }}
             </div>
+=======
+            <div class="week-title row ">
+                <div class="col-6">
+                    Semaine du {{ $weekStart->format('d M Y') }}
+                </div>
+                <div class="col-6 mb-2">
+                    @if($isCurrentWeek || $canEdit)
+                    <form action="{{ route('dupliquer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir dupliquer cette semaine ?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-success btn-sm">Dupliquer</button>
+                    </form>
+                    <form action="{{ route('supprimer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette semaine ?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer la Semaine</button>
+                    </form>
+                    <form action="{{ route('telecharger.menu', $week->id) }}" method="POST" style="display:inline-block;">
+                        @csrf
+                        <button type="submit" class="btn btn-secondary btn-sm">Télécharger Le PDF</button>
+                    </form>
+                    @endif
+                </div>
+            </div>
+
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                     <thead class="thead-light">
@@ -51,7 +78,11 @@
                                     <td>{{ $jour->jour }}</td>
                                     <td>{{ $plat->titre }}</td>
                                     <td class="actions">
+<<<<<<< HEAD
                                         @if($canEdit)
+=======
+                                        @if($canEdit || $isCurrentWeek)
+>>>>>>> 68287118a3d25b6cd4f58fb9dba67c4d883702d8
                                         <a href="{{ url('modifier_menu/' . $plat->id) }}" class="btn btn-warning btn-sm">Modifier</a>
 
                                         <!-- Formulaire de Suppression -->
