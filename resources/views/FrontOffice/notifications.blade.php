@@ -93,7 +93,9 @@
         <!-- Notifications -->
         @foreach($notifications as $notification)
             <div class="notification notification-{{ $notification->type }}">
-                <p>{{ $notification->message }}</p>
+                <p>{{ $notification->message }} <p>à: {{ $notification->created_at->format('d-m-Y H:i') }}</p>
+            </body></p>
+
             </div>
         @endforeach
     </div>

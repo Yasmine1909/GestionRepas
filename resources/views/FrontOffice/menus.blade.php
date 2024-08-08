@@ -27,11 +27,9 @@
     @foreach($weeks as $week)
         @php
             $weekStart = \Carbon\Carbon::parse($week->date_debut);
-            $weekEnd = $weekStart->copy()->endOfWeek(Carbon::FRIDAY); // Fin de la semaine (vendredi)
-            $isCurrentWeek = $weekStart->isSameWeek($startOfCurrentWeek);
-            $isPreviousWeek = $weekStart->isBefore($startOfCurrentWeek);
-            $isNextWeek = $weekStart->isSameWeek($startOfNextWeek);
-            $canEdit = $isNextWeek && $currentDate->isBefore($endOfCurrentWeekDate); // Modifiable uniquement avant jeudi
+            $currentDate = \Carbon\Carbon::now();
+            $isCurrentWeek = $weekStart->isSameWeek($currentDate);
+            $canEdit = !$isCurrentWeek && $weekStart->gt($currentDate->startOfWeek()->addDays(4)); // Seules les semaines après le jeudi de la semaine en cours sont modifiables
         @endphp
 
         <div class="week-container" data-week-start="{{ $weekStart->format('Y-m-d') }}">
@@ -41,17 +39,15 @@
                 </div>
                 <div class="col-6 mb-2">
                     @if($canEdit)
-                        <form action="{{ route('dupliquer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir dupliquer cette semaine ?');">
-                            @csrf
-                            <button type="submit" class="btn btn-success btn-sm">Dupliquer</button>
-                        </form>
-                        <form action="{{ route('supprimer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette semaine ?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Supprimer la Semaine</button>
-                        </form>
-                    @else
-                        <span class="consultation-only">Consultation uniquement</span>
+                    <form action="{{ route('dupliquer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir dupliquer cette semaine ?');">
+                        @csrf
+                        <button type="submit" class="btn btn-success btn-sm">Dupliquer</button>
+                    </form>
+                    <form action="{{ route('supprimer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette semaine ?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer la Semaine</button>
+                    </form>
                     @endif
                     <form action="{{ route('telecharger.menu', $week->id) }}" method="POST" style="display:inline-block;">
                         @csrf

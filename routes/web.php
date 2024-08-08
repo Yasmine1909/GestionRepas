@@ -27,7 +27,7 @@ use App\Http\Controllers\ReservationStatsController;
 Route::get('connexion', [ShowController::class, 'connexion'])->name('connexion');
 
 
-    Route::get('/', [ShowController::class, 'show'])->name('home');
+    // Route::get('/', [ShowController::class, 'show'])->name('home');
     Route::get('menu', [ShowController::class, 'menu']);
     Route::get('menus', [ShowController::class, 'menus']);
 
@@ -67,7 +67,8 @@ Route::get('connexion', [ShowController::class, 'connexion'])->name('connexion')
     Route::post('/reservations/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
 
     // Route pour réserver toute la semaine suivante
-    Route::post('/reservations/reserve-week', [ReservationController::class, 'reserveWeek'])->name('reservations.reserveWeek');
+    // Route::post('/reservations/reserve-week', [ReservationController::class, 'reserveWeek'])->name('reservations.reserveWeek');
+    Route::post('/reserve-week', [ReservationController::class, 'reserveWeek'])->name('reserve.week');
 
 
 

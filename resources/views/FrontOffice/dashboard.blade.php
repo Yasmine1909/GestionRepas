@@ -121,8 +121,9 @@
 }
     .reserve-week-btn {
         position: absolute;
-        left: -50px; /* Ajustez cette valeur selon vos besoins */
-        top: 420px; /* Ajustez cette valeur selon vos besoins */
+        left: -50px;
+        top: 335px;
+
         background-color: #007bff;
         color: #ffffff;
         border: none;
@@ -192,55 +193,55 @@
 
         <!-- Generate calendar days -->
         @foreach ($calendarDays->chunk(8) as $week)
-    @foreach ($week as $day)
-        @php
-            $dateString = $day->format('Y-m-d');
-            $jour = $jours->get($dateString);
-            $plats = $jour ? $jour->plats->pluck('titre')->implode(', ') : '';
-            $isNextWeek = $day->between(now()->addWeek()->startOfWeek(), now()->addWeek()->endOfWeek());
-            $isReserved = $reservations->contains('date', $dateString);
-            $hasPlats = !empty($plats);
-            $dayClass = '';
+            @foreach ($week as $day)
+                @php
+                    $dateString = $day->format('Y-m-d');
+                    $jour = $jours->get($dateString);
+                    $plats = $jour ? $jour->plats->pluck('titre')->implode(', ') : '';
+                    $isReservableWeek = $day->between($currentWeekStart, $currentWeekEnd);
+                    $isReserved = $reservations->contains('date', $dateString);
+                    $hasPlats = !empty($plats);
+                    $dayClass = '';
 
-            if ($isNextWeek) {
-                $dayClass .= 'next-week ';
-                if ($isReserved) {
-                    $dayClass .= 'reserved ';
-                }
-                if ($hasPlats) {
-                    $dayClass .= 'clickable';
-                } else {
-                    $dayClass .= 'disabled';
-                }
-            } else {
-                $dayClass .= 'disabled';
-            }
-        @endphp
-        <div class="{{ $dayClass }}"
-            data-date="{{ $dateString }}"
-            data-plats="{{ $plats }}"
-            data-status="{{ $jour ? $jour->status : 'available' }}"
-            data-reason="{{ $jour ? $jour->reason : '' }}">
-           {{ $day->day }}
-           @if ($plats)
-               <div class="plat-info">{{ $plats }}</div>
-           @endif
+                    if ($isReservableWeek) {
+                        $dayClass .= 'reservable-week ';
+                        if ($isReserved) {
+                            $dayClass .= 'reserved ';
+                        }
+                        if ($hasPlats) {
+                            $dayClass .= 'clickable';
+                        } else {
+                            $dayClass .= 'disabled';
+                        }
+                    } else {
+                        $dayClass .= 'disabled';
+                    }
+                @endphp
+                <div class="{{ $dayClass }}"
+                    data-date="{{ $dateString }}"
+                    data-plats="{{ $plats }}"
+                    data-status="{{ $jour ? $jour->status : 'available' }}"
+                    data-reason="{{ $jour ? $jour->reason : '' }}">
+                    {{ $day->day }}
+                    @if ($plats)
+                        <div class="plat-info">{{ $plats }}</div>
+                    @endif
 
-           <!-- Display additional information for reserved days -->
-       </div>
+                    <!-- Display additional information for reserved days -->
+                </div>
 
-        @if ($day->isSunday())
-            @php
-                $weekStartDate = $day->copy()->startOfWeek()->format('Y-m-d');
-            @endphp
-            <div class="download">
-                <a href="{{ route('download.menu', $weekStartDate) }}" class="btn btn-success download">Télécharger le Menu</a>
-            </div>
-        @endif
-    @endforeach
-@endforeach
-
+                @if ($day->isSunday())
+                    @php
+                        $weekStartDate = $day->copy()->startOfWeek()->format('Y-m-d');
+                    @endphp
+                    <div class="download">
+                        <a href="{{ route('download.menu', $weekStartDate) }}" class="btn btn-success download">Télécharger le Menu</a>
+                    </div>
+                @endif
+            @endforeach
+        @endforeach
     </div>
+
 </div>
 <div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -388,30 +389,54 @@
       });
 
       $('#reserveWeekBtn').on('click', function() {
-          var weekStart = '{{ now()->startOfWeek()->format('Y-m-d') }}';
-          console.log('Réservation pour la semaine commençant le ' + weekStart);
+    var reservableDays = [];
 
-          $.ajax({
-              url: '{{ route('reserve') }}',
-              type: 'POST',
-              data: {
-                  weekStart: weekStart,
-                  _token: '{{ csrf_token() }}'
-              },
-              success: function(response) {
-                  console.log('Réponse reçue : ', response);
-                  alert(response.message);
-              },
-              error: function(xhr) {
-                  console.log('Erreur : ', xhr);
-                  var errorMsg = 'Erreur lors de la réservation.';
-                  if (xhr.responseJSON && xhr.responseJSON.message) {
-                      errorMsg = xhr.responseJSON.message;
-                  }
-                  alert(errorMsg);
-              }
-          });
-      });
+    $('.calendar .clickable.reservable-week').each(function() {
+        var date = $(this).data('date');
+        var plats = $(this).data('plats');
+        if (plats) { // Vérifie qu'il y a bien un plat pour ce jour
+            reservableDays.push({
+                date: date,
+                plats: plats
+            });
+        }
+    });
+
+    if (reservableDays.length > 0) {
+        $.ajax({
+            url: '{{ route('reserve.week') }}', // Créez cette route pour gérer la réservation de toute la semaine
+            type: 'POST',
+            data: {
+                days: reservableDays,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Mettez à jour le calendrier pour afficher les jours réservés
+                    reservableDays.forEach(function(day) {
+                        $('.calendar .clickable[data-date="' + day.date + '"]').addClass('reserved');
+                    });
+                    alert('Tous les jours disponibles pour la semaine ont été réservés.');
+                } else {
+                    alert('Erreur lors de la réservation de la semaine.');
+                }
+            },
+            error: function(xhr) {
+                var errorMsg = 'Erreur lors de la réservation.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                alert(errorMsg);
+            }
+        });
+    } else {
+        alert('Aucun jour disponible à réserver pour cette semaine.');
+    }
+});
+
+
+
+
   });
   </script>
 

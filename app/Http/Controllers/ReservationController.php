@@ -12,40 +12,54 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\NotificationController;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificationMail;
 class ReservationController extends Controller
 {
     public function index()
-    {
-        $now = Carbon::now();
-        $startOfDisplayWeek = $now->copy()->startOfWeek()->subWeeks(2);
-        $endOfDisplayWeek = $now->copy()->endOfWeek()->addWeeks(2);
-        $user = auth()->user();
+{
+    $now = Carbon::now();
+    $currentDayOfWeek = $now->dayOfWeek;
 
-        $reservations = Reservation::where('user_id', $user->id)->get();
-
-        $jours = Jour::whereBetween('date', [$startOfDisplayWeek, $endOfDisplayWeek])
-            ->with('plats')
-            ->get()
-            ->keyBy(function($item) {
-                return Carbon::parse($item->date)->format('Y-m-d');
-            });
-
-        $calendarDays = collect();
-        $currentDay = $startOfDisplayWeek->copy();
-        while ($currentDay->lte($endOfDisplayWeek)) {
-            $calendarDays->push($currentDay->copy());
-            $currentDay->addDay();
-        }
-
-        return view('FrontOffice.dashboard', [
-            'calendarDays' => $calendarDays,
-            'jours' => $jours,
-            'currentWeekStart' => $now->startOfWeek(),
-            'reservations' => $reservations,
-            'currentWeekEnd' => $now->endOfWeek()
-        ]);
+    // Déterminer la semaine réservable
+    if ($currentDayOfWeek >= Carbon::FRIDAY) {
+        $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
+        $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
+    } else {
+        $startOfReservableWeek = $now->copy()->addWeek()->startOfWeek();
+        $endOfReservableWeek = $now->copy()->addWeek()->endOfWeek();
     }
+
+    // Définir les semaines précédentes et suivantes à afficher
+    $startOfDisplayWeek = $startOfReservableWeek->copy()->subWeeks(2);
+    $endOfDisplayWeek = $endOfReservableWeek->copy()->addWeeks(1);
+
+    $user = auth()->user();
+    $reservations = Reservation::where('user_id', $user->id)->get();
+
+    $jours = Jour::whereBetween('date', [$startOfDisplayWeek, $endOfDisplayWeek])
+        ->with('plats')
+        ->get()
+        ->keyBy(function($item) {
+            return Carbon::parse($item->date)->format('Y-m-d');
+        });
+
+    $calendarDays = collect();
+    $currentDay = $startOfDisplayWeek->copy();
+    while ($currentDay->lte($endOfDisplayWeek)) {
+        $calendarDays->push($currentDay->copy());
+        $currentDay->addDay();
+    }
+
+    return view('FrontOffice.dashboard', [
+        'calendarDays' => $calendarDays,
+        'jours' => $jours,
+        'currentWeekStart' => $startOfReservableWeek,
+        'reservations' => $reservations,
+        'currentWeekEnd' => $endOfReservableWeek
+    ]);
+}
+
 
     public function downloadMenu($startDate)
     {
@@ -131,6 +145,8 @@ public function validateReservation(Request $request)
         return response()->json(['message' => 'Réservation enregistrée avec succès', 'success' => true], 200);
     }
 
+
+
     public function cancel(Request $request)
     {
         $request->validate([
@@ -144,21 +160,20 @@ public function validateReservation(Request $request)
 
         if ($reservation) {
             try {
-                // Assurez-vous que la réservation est supprimée avec succès
                 $reservation->delete();
+                $date = Carbon::parse($reservation->date);
 
-                // Assurez-vous que la date est un objet Carbon
-                $date = $reservation->date instanceof Carbon
-                    ? $reservation->date
-                    : Carbon::parse($reservation->date);
-
-                // Créer une notification pour l'annulation
-                Notification::create([
+                // Création de la notification
+                $notification = Notification::create([
                     'user_id' => $reservation->user_id,
                     'type' => 'danger',
                     'message' => 'Votre réservation pour le ' . $date->format('d-m-Y') . ' a été annulée.'
                 ]);
 
+                // Envoi de l'email d'annulation
+                Mail::to($reservation->user->email)->send(new NotificationMail($notification));
+
+                Log::info('Réservation annulée et email envoyé avec succès à ' . $reservation->user->email);
                 return response()->json(['message' => 'Réservation annulée avec succès'], 200);
             } catch (\Exception $e) {
                 Log::error('Erreur lors de l\'annulation de la réservation ou de la création de la notification : ' . $e->getMessage());
@@ -171,34 +186,67 @@ public function validateReservation(Request $request)
 
 
 
-    public function reserveWeek()
+
+    // public function reserveWeek(Request $request)
+    // {
+    //     $days = $request->input('days');
+    //     $userId = auth()->id();
+
+    //     foreach ($days as $day) {
+    //         $date = Carbon::parse($day['date'])->format('Y-m-d');
+
+    //         // Trouver le plat correspondant au jour donné
+    //         $plat = Plat::whereHas('jour', function ($query) use ($date) {
+    //             $query->where('date', $date);
+    //         })->first();
+
+    //         if ($plat) {
+    //             // Créer ou mettre à jour la réservation pour ce jour avec le plat associé
+    //             $reservation = Reservation::updateOrCreate(
+    //                 ['user_id' => $userId, 'date' => $date],
+    //                 ['status' => 'available', 'plat_id' => $plat->id]
+    //             );
+
+    //             // Créer une notification pour la réservation
+    //             app(NotificationController::class)->storeReservationNotification($reservation->id);
+    //         }
+    //     }
+
+    //     return response()->json(['success' => true]);
+    // }
+    public function reserveWeek(Request $request)
     {
-        $user = auth()->user();
-        $startOfWeek = Carbon::now()->addWeek()->startOfWeek();
-        $endOfWeek = Carbon::now()->addWeek()->endOfWeek();
+        $days = $request->input('days');
+        $userId = auth()->id();
+        $reservedDates = Reservation::where('user_id', $userId)->pluck('date')->toArray();
 
-        $jours = Jour::whereBetween('date', [$startOfWeek, $endOfWeek])
-                     ->whereHas('plats')
-                     ->get();
+        foreach ($days as $day) {
+            $date = Carbon::parse($day['date'])->format('Y-m-d');
 
-        if ($jours->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'Aucun plat trouvé pour la semaine suivante'], 400);
-        }
+            // Vérifier si la date est déjà réservée
+            if (in_array($date, $reservedDates)) {
+                continue; // Passer à la date suivante si elle est déjà réservée
+            }
 
-        foreach ($jours as $jour) {
-            $reservation = Reservation::where('user_id', $user->id)
-                                      ->where('date', $jour->date)
-                                      ->first();
+            // Trouver le plat correspondant au jour donné
+            $plat = Plat::whereHas('jour', function ($query) use ($date) {
+                $query->where('date', $date);
+            })->first();
 
-            if (!$reservation) {
-                Reservation::create([
-                    'user_id' => $user->id,
-                    'date' => $jour->date,
-                    'status' => 'available'
-                ]);
+            if ($plat) {
+                // Créer ou mettre à jour la réservation pour ce jour avec le plat associé
+                $reservation = Reservation::updateOrCreate(
+                    ['user_id' => $userId, 'date' => $date],
+                    ['status' => 'available', 'plat_id' => $plat->id]
+                );
+
+                // Créer une notification pour la réservation
+                app(NotificationController::class)->storeReservationNotification($reservation->id);
             }
         }
 
-        return response()->json(['message' => 'Réservations de la semaine enregistrées avec succès'], 200);
+        return response()->json(['success' => true]);
     }
+
+
 }

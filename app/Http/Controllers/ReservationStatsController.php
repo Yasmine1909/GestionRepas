@@ -38,18 +38,24 @@ class ReservationStatsController extends Controller
             'confirmedList' => User::whereIn('id', $confirmedReservations)->get()->map(function($user) {
                 return [
                     'name' => $user->name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
                     'status' => 'Confirmé'
                 ];
             }),
             'notAvailableList' => User::whereIn('id', $notAvailableUsers)->get()->map(function($user) {
                 return [
                     'name' => $user->name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
                     'status' => 'Non Disponible'
                 ];
             }),
             'noResponseList' => $noResponseUsers->map(function($user) {
                 return [
                     'name' => $user->name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
                     'status' => 'Pas Encore Répondu'
                 ];
             }),
