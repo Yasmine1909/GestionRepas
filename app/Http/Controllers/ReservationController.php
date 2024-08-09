@@ -187,33 +187,7 @@ public function validateReservation(Request $request)
 
 
 
-    // public function reserveWeek(Request $request)
-    // {
-    //     $days = $request->input('days');
-    //     $userId = auth()->id();
 
-    //     foreach ($days as $day) {
-    //         $date = Carbon::parse($day['date'])->format('Y-m-d');
-
-    //         // Trouver le plat correspondant au jour donné
-    //         $plat = Plat::whereHas('jour', function ($query) use ($date) {
-    //             $query->where('date', $date);
-    //         })->first();
-
-    //         if ($plat) {
-    //             // Créer ou mettre à jour la réservation pour ce jour avec le plat associé
-    //             $reservation = Reservation::updateOrCreate(
-    //                 ['user_id' => $userId, 'date' => $date],
-    //                 ['status' => 'available', 'plat_id' => $plat->id]
-    //             );
-
-    //             // Créer une notification pour la réservation
-    //             app(NotificationController::class)->storeReservationNotification($reservation->id);
-    //         }
-    //     }
-
-    //     return response()->json(['success' => true]);
-    // }
     public function reserveWeek(Request $request)
     {
         $days = $request->input('days');

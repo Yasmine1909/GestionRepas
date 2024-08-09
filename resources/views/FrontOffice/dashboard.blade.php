@@ -122,7 +122,7 @@
     .reserve-week-btn {
         position: absolute;
         left: -50px;
-        top: 335px;
+        top: 380px;
 
         background-color: #007bff;
         color: #ffffff;
@@ -166,20 +166,39 @@
     .btn-success-custom:hover {
         background-color: #218838;
     }
+    .icon-legend {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .icon-legend div {
+        margin: 0 15px;
+        text-align: center;
+    }
+    .icon-legend i {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
 </style>
 @section('content')
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 
+
+
 <div class="container" style="margin-top: 10%; margin-bottom: 5%; position: relative;">
+
     <h1 class="text-center mb-4">Réservations de Repas</h1>
     <button class="reserve-week-btn" id="reserveWeekBtn">Réserver Toute la Semaine</button>
+
+
     <div class="calendar">
         <!-- Headers for days of the week and download buttons -->
         <div class="header">Lun</div>
@@ -199,7 +218,8 @@
                     $jour = $jours->get($dateString);
                     $plats = $jour ? $jour->plats->pluck('titre')->implode(', ') : '';
                     $isReservableWeek = $day->between($currentWeekStart, $currentWeekEnd);
-                    $isReserved = $reservations->contains('date', $dateString);
+                    $reservation = $reservations->firstWhere('date', $dateString);
+                    $isReserved = !is_null($reservation);
                     $hasPlats = !empty($plats);
                     $dayClass = '';
 
@@ -216,18 +236,41 @@
                     } else {
                         $dayClass .= 'disabled';
                     }
+
+                    // Déterminer l'icône à afficher
+                    $icon = '';
+                    if ($isReserved) {
+                        if ($reservation->status === 'available') {
+                            $icon = '<i class="fas fa-check-circle mt-1" style="color: green;"></i>';
+                        } elseif ($reservation->status === 'unavailable') {
+                            switch ($reservation->reason) {
+                                case 'Déplacement':
+                                    $icon = '<i class="fas fa-car mt-1" style="color: rgb(97, 74, 4);"></i>';
+                                    break;
+                                case 'Congé':
+                                    $icon = '<i class="fas fa-umbrella-beach mt-1" style="color: rgb(97, 74, 4);"></i>';
+                                    break;
+                                case 'Régime':
+                                    $icon = '<i class="fas fa-apple-alt mt-1" style="color: rgb(97, 74, 4);"></i>';
+                                    break;
+                                default:
+                                    $icon = '<i class="fas fa-times-circle mt-1" style="color: gray;"></i>';
+                                    break;
+                            }
+                        }
+                    }
                 @endphp
                 <div class="{{ $dayClass }}"
                     data-date="{{ $dateString }}"
                     data-plats="{{ $plats }}"
-                    data-status="{{ $jour ? $jour->status : 'available' }}"
-                    data-reason="{{ $jour ? $jour->reason : '' }}">
+                    data-status="{{ $reservation ? $reservation->status : 'available' }}"
+                    data-reason="{{ $reservation ? $reservation->reason : '' }}">
                     {{ $day->day }}
                     @if ($plats)
                         <div class="plat-info">{{ $plats }}</div>
                     @endif
-
-                    <!-- Display additional information for reserved days -->
+                    <!-- Afficher l'icône -->
+                    {!! $icon !!}
                 </div>
 
                 @if ($day->isSunday())
@@ -241,8 +284,29 @@
             @endforeach
         @endforeach
     </div>
+    <div class="icon-legend">
+        <div>
+            <i class="fas fa-check-circle" style="color: green;"></i>
+            <div>Disponible</div>
+        </div>
+        <div>
+            <i class="fas fa-umbrella-beach" style="color: rgb(97, 74, 4);"></i>
+            <div>Congé</div>
+        </div>
+        <div>
+            <i class="fas fa-car" style="color: rgb(97, 74, 4);"></i>
+            <div>Déplacement</div>
+        </div>
+        <div>
+            <i class="fas fa-apple-alt" style="color: rgb(97, 74, 4);"></i>
+            <div>Régime</div>
+        </div>
+
+    </div>
 
 </div>
+
+
 <div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -266,9 +330,9 @@
                     <div id="nonAvailabilityReason" style="display: none; margin-top: 10px;">
                         <p><strong>Motif de non disponibilité:</strong></p>
                         <select class="form-control" id="reasonSelect">
-                            <option value="Déplacement">Déplacement</option>
-                            <option value="Congé">Congé</option>
-                            <option value="Régime">Régime</option>
+                            <option value="Déplacement">Déplacement </option>
+                            <option value="Congé">Congé </option>
+                            <option value="Régime">Régime </option>
                         </select>
                     </div>
                 </div>
@@ -286,7 +350,7 @@
 
 
 
-<script>
+{{-- <script>
     $(document).ready(function() {
       $('.clickable').on('click', function() {
           var date = $(this).data('date');
@@ -436,9 +500,167 @@
 
 
 
+function handleReservation(response) {
+    if (response.success) {
+        alert(response.message); // Affiche 'Réservation Réussie'
+        // Vous pouvez aussi afficher ce message dans un élément spécifique de votre page
+        document.getElementById('message').innerHTML = `<div class="alert alert-success">${response.message}</div>`;
+    } else {
+        alert('Erreur : ' + response.message);
+    }
+}
+
+function handleCancellation(response) {
+    if (response.success) {
+        alert(response.message); // Affiche 'Annulation Réussie'
+        document.getElementById('message').innerHTML = `<div class="alert alert-success">${response.message}</div>`;
+    } else {
+        alert('Erreur : ' + response.message);
+    }
+}
+
+// Exemple de fonction pour effectuer une réservation
+function reserveDate(date) {
+    fetch('/reserve', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ date: date })
+    })
+    .then(response => response.json())
+    .then(data => handleReservation(data))
+    .catch(error => console.error('Erreur:', error));
+}
+
+// Exemple de fonction pour annuler une réservation
+function cancelReservation(date) {
+    fetch('/cancel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ date: date })
+    })
+    .then(response => response.json())
+    .then(data => handleCancellation(data))
+    .catch(error => console.error('Erreur:', error));
+}
 
   });
-  </script>
+  </script> --}}
+
+  <script>
+    $(document).ready(function() {
+        $('.clickable').on('click', function() {
+            var date = $(this).data('date');
+            var plats = $(this).data('plats');
+            var status = $(this).data('status'); // Assurez-vous que ces données sont passées
+            var reason = $(this).data('reason'); // Assurez-vous que ces données sont passées
+            var isReserved = $(this).hasClass('reserved');
+
+            $('#menuDate').text(date);
+            $('#menuPlats').text(plats);
+
+            if (isReserved) {
+                $('#reservationOptions').hide();
+                $('#reserveBtn').hide();
+                $('#cancelButton').show();
+
+                if (status === 'unavailable') {
+                    $('#nonAvailabilityReason').show();
+                    $('#reasonSelect').val(reason); // Prend la valeur de la raison de non-disponibilité
+                    $('#modalMessage').text('Vous avez confirmé votre non disponibilité pour raison: ' + reason);
+                } else {
+                    $('#nonAvailabilityReason').hide();
+                    $('#modalMessage').text('Vous avez confirmé votre disponibilité');
+                }
+            } else {
+                $('#reservationOptions').show();
+                $('#reserveBtn').show();
+                $('#cancelButton').hide();
+                $('#nonAvailabilityReason').hide();
+                $('#modalMessage').text('');
+            }
+
+            $('#availableRadio').prop('checked', status === 'available');
+            $('#notAvailableRadio').prop('checked', status === 'unavailable');
+
+            $('#menuModal').modal('show');
+        });
+
+        // Option pour la raison de non-disponibilité
+        $('input[name="status"]').change(function() {
+            if ($(this).val() === 'unavailable') {
+                $('#nonAvailabilityReason').show();
+            } else {
+                $('#nonAvailabilityReason').hide();
+            }
+        });
+
+        // Gestion des boutons de réservation et d'annulation
+        $('#reserveBtn').on('click', function() {
+            var date = $('#menuDate').text();
+            var status = $('input[name="status"]:checked').val();
+            var reason = $('#reasonSelect').val();
+
+            $.ajax({
+                url: '{{ route('reserve') }}',
+                type: 'POST',
+                data: {
+                    date: date,
+                    status: status,
+                    reason: reason,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('.calendar .clickable[data-date="' + date + '"]').addClass('reserved');
+                        $('#modalMessage').text(status === 'available' ? 'Vous avez confirmé votre disponibilité' : 'Vous avez confirmé votre non disponibilité pour raison: ' + reason);
+                    }
+                    $('#menuModal').modal('hide');
+                },
+                error: function(xhr) {
+                    var errorMsg = 'Erreur lors de la réservation.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    alert(errorMsg);
+                    $('#menuModal').modal('hide');
+                }
+            });
+        });
+
+        $('#cancelButton').on('click', function() {
+            var date = $('#menuDate').text();
+
+            $.ajax({
+                url: '{{ route("reservations.cancel") }}',
+                type: 'POST',
+                data: {
+                    date: date,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('.calendar .clickable[data-date="' + date + '"]').removeClass('reserved');
+                    $('#modalMessage').text('Réservation annulée pour la date: ' + date);
+                    $('#menuModal').modal('hide');
+                },
+                error: function(response) {
+                    var errorMsg = 'Erreur lors de l\'annulation.';
+                    if (response.responseJSON && response.responseJSON.message) {
+                        errorMsg = response.responseJSON.message;
+                    }
+                    alert(errorMsg);
+                    $('#menuModal').modal('hide');
+                }
+            });
+        });
+    });
+    </script>
+
 
 
 @endsection

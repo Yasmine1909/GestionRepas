@@ -59,32 +59,7 @@ class NotificationController extends Controller
         Mail::to($reservation->user->email)->send(new NotificationMail($notification));
     }
 
-    // public function storeCancellationNotification($reservationId)
-    // {
-    //     // Récupérer la réservation
-    //     $reservation = Reservation::find($reservationId);
 
-    //     if (!$reservation) {
-    //         Log::error('Réservation non trouvée pour ID : ' . $reservationId);
-    //         return;
-    //     }
-
-    //     // Assurez-vous que la date est un objet Carbon
-    //     $date = $reservation->date instanceof Carbon
-    //         ? $reservation->date
-    //         : Carbon::parse($reservation->date);
-
-    //     // Créer une notification pour l'annulation
-    //     try {
-    //         Notification::create([
-    //             'user_id' => $reservation->user_id,
-    //             'type' => 'danger',
-    //             'message' => 'Votre réservation pour le ' . $date->format('d-m-Y') . ' a été annulée.'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         Log::error('Erreur lors de la création de la notification : ' . $e->getMessage());
-    //     }
-    // }
 
     public function storeCancellationNotification($reservationId)
     {
@@ -114,6 +89,8 @@ class NotificationController extends Controller
             Log::error('Erreur lors de la création de la notification ou de l\'envoi de l\'email : ' . $e->getMessage());
         }
     }
+
+   
 
 }
 
