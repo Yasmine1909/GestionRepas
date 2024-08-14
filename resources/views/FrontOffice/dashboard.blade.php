@@ -350,7 +350,7 @@
 
 
 
-{{-- <script>
+<script>
     $(document).ready(function() {
       $('.clickable').on('click', function() {
           var date = $(this).data('date');
@@ -550,10 +550,10 @@ function cancelReservation(date) {
 }
 
   });
-  </script> --}}
+  </script>
 
-  <script>
-    $(document).ready(function() {
+  {{-- <script> --}}
+    {{-- $(document).ready(function() {
         $('.clickable').on('click', function() {
             var date = $(this).data('date');
             var plats = $(this).data('plats');
@@ -659,7 +659,7 @@ function cancelReservation(date) {
             });
         });
     });
-    </script>
+    </script> --}}
 
 
 
