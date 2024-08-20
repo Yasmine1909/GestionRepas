@@ -30,30 +30,30 @@ class ShowController extends Controller
     }
 
     public function menus()
-{
-    if (Auth::check()) {
-    $currentDate = Carbon::now();
+    {
+        if (Auth::check()) {
+        $currentDate = Carbon::now();
 
-    // Calculer le début et la fin de la semaine courante
-    $startOfCurrentWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
-    $endOfCurrentWeek = $startOfCurrentWeek->copy()->endOfWeek(Carbon::THURSDAY); // Jeudi de la semaine en cours
+        // Calculer le début et la fin de la semaine courante
+        $startOfCurrentWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
+        $endOfCurrentWeek = $startOfCurrentWeek->copy()->endOfWeek(Carbon::THURSDAY); // Jeudi de la semaine en cours
 
-    // Début de la semaine suivante
-    $startOfNextWeek = $startOfCurrentWeek->copy()->addWeek();
+        // Début de la semaine suivante
+        $startOfNextWeek = $startOfCurrentWeek->copy()->addWeek();
 
-    // Calculer la date limite (jeudi de la semaine actuelle)
-    $endOfCurrentWeekDate = $endOfCurrentWeek->format('Y-m-d');
+        // Calculer la date limite (jeudi de la semaine actuelle)
+        $endOfCurrentWeekDate = $endOfCurrentWeek->format('Y-m-d');
 
-    // Récupérer les semaines avec les jours et plats
-    $weeks = Semaine::with('jours.plats')->orderBy('date_debut', 'desc')->get();
+        // Récupérer les semaines avec les jours et plats
+        $weeks = Semaine::with('jours.plats')->orderBy('date_debut', 'desc')->get();
 
-    return view('FrontOffice.menus', compact('weeks', 'currentDate', 'startOfCurrentWeek', 'endOfCurrentWeek', 'startOfNextWeek', 'endOfCurrentWeekDate'));
+        return view('FrontOffice.menus', compact('weeks', 'currentDate', 'startOfCurrentWeek', 'endOfCurrentWeek', 'startOfNextWeek', 'endOfCurrentWeekDate'));
 
-} else {
-    // Rediriger ou gérer les utilisateurs non connectés
-    return redirect()->route('login');
-}
-}
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
+    }
 
 
 

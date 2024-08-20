@@ -71,7 +71,7 @@ class ReservationController extends Controller
     ]);
 } else {
     // Rediriger ou gérer les utilisateurs non connectés
-    return redirect()->route('login');
+    return redirect()->route('connexion');
 }
 }
 

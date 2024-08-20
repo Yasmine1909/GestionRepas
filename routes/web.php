@@ -23,10 +23,11 @@ use App\Http\Controllers\ReservationStatsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-// Route pour la page de connexion
+//  la page de connexion
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 
+// Route pour la page de connexion
+Route::get('connexion', [ShowController::class, 'connexion'])->name('connexion');
 // Authentification
 Auth::routes(); // Génère les routes d'authentification par défaut
 
