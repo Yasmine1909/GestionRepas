@@ -47,7 +47,7 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <div class="logo me-auto">
-        <h1><a href="{{ url('/') }}" style="font-family:Satisfy;">M2M</a></h1>
+        <h1><a href="#" style="font-family:Satisfy;">M2M</a></h1>
       </div>
 
       <nav id="navbar" class="navbar order-last order-lg-0">
@@ -55,17 +55,20 @@
           <li><a class="nav-link scrollto" href="/admin/active-days-configuration">Configuration</a></li>
           <li><a class="nav-link scrollto" href="/admin/ajouter-menu">Ajout Des Plats</a></li>
           <li><a class="nav-link scrollto" href="/menus">Consultation</a></li>
+          <li><a class="nav-link scrollto" href="/statistiques">Statistiques</a></li>
           <i class="bi bi-list mobile-nav-toggle"></i>
         </ul>
       </nav><!-- .navbar -->
 
-      <!-- Formulaire de déconnexion -->
-      <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+      @auth
+      <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
         @csrf
       </form>
 
       <!-- Bouton de déconnexion -->
       <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="book-a-table-btn scrollto">Déconnexion</a>
+    @endauth
+
 
     </div>
   </header><!-- End Header -->

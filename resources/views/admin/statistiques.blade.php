@@ -54,7 +54,7 @@
             <div class="stat-card">
                 <h5>Non Disponibles</h5>
                 <span id="totalNotAvailableReservations" class="display-4">0</span>
-                <button class="btn btn-danger btn-block mb-2" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
+                <button class="btn btn-warning btn-block mb-2" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
 
             </div>
         </div>
@@ -62,7 +62,7 @@
             <div class="stat-card">
                 <h5>Pas Encore Répondu</h5>
                 <span id="totalNoResponseReservations" class="display-4">0</span>
-                <button class="btn btn-warning btn-block mb-2" id="downloadNoResponseList">Télécharger la Liste en PDF</button>
+                <button class="btn btn-danger btn-block mb-2" id="downloadNoResponseList">Télécharger la Liste en PDF</button>
             </div>
         </div>
     </div>
@@ -87,7 +87,7 @@
         </div>
     </div>
 
-  
+
 
 
 </div>

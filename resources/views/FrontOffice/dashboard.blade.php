@@ -181,6 +181,11 @@
         font-size: 24px;
         margin-bottom: 5px;
     }
+    .calendar .weekend {
+    background-color: #7f8f9e; /* Gris foncé */
+    color: #ffffff;
+}
+
 </style>
 @section('content')
 
@@ -203,88 +208,97 @@
 
     <div class="calendar">
         <!-- Headers for days of the week and download buttons -->
-        <div class="header">Lun</div>
-        <div class="header">Mar</div>
-        <div class="header">Mer</div>
-        <div class="header">Jeu</div>
-        <div class="header">Ven</div>
-        <div class="header">Sam</div>
-        <div class="header">Dim</div>
-        <div class="header">Télécharger</div>
+<div class="header">Lun</div>
+<div class="header">Mar</div>
+<div class="header">Mer</div>
+<div class="header">Jeu</div>
+<div class="header">Ven</div>
+<div class="header ">Sam</div>
+<div class="header ">Dim</div>
+<div class="header">Télécharger</div>
 
-        <!-- Generate calendar days -->
-        @foreach ($calendarDays->chunk(8) as $week)
-            @foreach ($week as $day)
-                @php
-                    $dateString = $day->format('Y-m-d');
-                    $jour = $jours->get($dateString);
-                    $plats = $jour ? $jour->plats->pluck('titre')->implode(', ') : '';
-                    $isReservableWeek = $day->between($currentWeekStart, $currentWeekEnd);
-                    $reservation = $reservations->firstWhere('date', $dateString);
-                    $isReserved = !is_null($reservation);
-                    $hasPlats = !empty($plats);
-                    $dayClass = '';
+<!-- Generate calendar days -->
+@foreach ($calendarDays->chunk(8) as $week)
+    @foreach ($week as $day)
+        @php
+            $dateString = $day->format('Y-m-d');
+            $jour = $jours->get($dateString);
+            $plats = $jour ? $jour->plats->pluck('titre')->implode(', ') : '';
+            $isReservableWeek = $day->between($currentWeekStart, $currentWeekEnd);
+            $reservation = $reservations->firstWhere('date', $dateString);
+            $isReserved = !is_null($reservation);
+            $hasPlats = !empty($plats);
+            $dayClass = '';
 
-                    if ($isReservableWeek) {
-                        $dayClass .= 'reservable-week ';
-                        if ($isReserved) {
-                            $dayClass .= 'reserved ';
-                        }
-                        if ($hasPlats) {
-                            $dayClass .= 'clickable';
-                        } else {
-                            $dayClass .= 'disabled';
-                        }
-                    } else {
-                        $dayClass .= 'disabled';
+            if ($day->isSaturday() || $day->isSunday()) {
+                $dayClass .= 'weekend ';
+            }
+
+            if ($isReservableWeek) {
+                $dayClass .= 'reservable-week ';
+                if ($isReserved) {
+                    $dayClass .= 'reserved ';
+                }
+                if ($hasPlats) {
+                    $dayClass .= 'clickable';
+                } else {
+                    $dayClass .= 'disabled';
+                }
+            } else {
+                $dayClass .= 'disabled';
+            }
+
+            // Déterminer l'icône à afficher
+            $icon = '';
+            if ($isReserved) {
+                if ($reservation->status === 'available') {
+                    $icon = '<i class="fas fa-check-circle mt-1" style="color: green;"></i>';
+                } elseif ($reservation->status === 'unavailable') {
+                    switch ($reservation->reason) {
+                        case 'Déplacement':
+                            $icon = '<i class="fas fa-car mt-1" style="color: rgb(97, 74, 4);"></i>';
+                            break;
+                        case 'Congé':
+                            $icon = '<i class="fas fa-umbrella-beach mt-1" style="color: rgb(97, 74, 4);"></i>';
+                            break;
+                        case 'Régime':
+                            $icon = '<i class="fas fa-apple-alt mt-1" style="color: rgb(97, 74, 4);"></i>';
+                            break;
+                        default:
+                            $icon = '<i class="fas fa-times-circle mt-1" style="color: gray;"></i>';
+                            break;
                     }
+                }
+            }
+        @endphp
+        <div class="{{ $dayClass }}"
+            data-date="{{ $dateString }}"
+            data-plats="{{ $plats }}"
+            data-status="{{ $reservation ? $reservation->status : 'available' }}"
+            data-reason="{{ $reservation ? $reservation->reason : '' }}">
+            {{ $day->day }}
+            @if ($plats)
+                <div class="plat-info">{{ $plats }}</div>
+            @endif
+            <!-- Afficher l'icône -->
+            {!! $icon !!}
+        </div>
 
-                    // Déterminer l'icône à afficher
-                    $icon = '';
-                    if ($isReserved) {
-                        if ($reservation->status === 'available') {
-                            $icon = '<i class="fas fa-check-circle mt-1" style="color: green;"></i>';
-                        } elseif ($reservation->status === 'unavailable') {
-                            switch ($reservation->reason) {
-                                case 'Déplacement':
-                                    $icon = '<i class="fas fa-car mt-1" style="color: rgb(97, 74, 4);"></i>';
-                                    break;
-                                case 'Congé':
-                                    $icon = '<i class="fas fa-umbrella-beach mt-1" style="color: rgb(97, 74, 4);"></i>';
-                                    break;
-                                case 'Régime':
-                                    $icon = '<i class="fas fa-apple-alt mt-1" style="color: rgb(97, 74, 4);"></i>';
-                                    break;
-                                default:
-                                    $icon = '<i class="fas fa-times-circle mt-1" style="color: gray;"></i>';
-                                    break;
-                            }
-                        }
-                    }
-                @endphp
-                <div class="{{ $dayClass }}"
-                    data-date="{{ $dateString }}"
-                    data-plats="{{ $plats }}"
-                    data-status="{{ $reservation ? $reservation->status : 'available' }}"
-                    data-reason="{{ $reservation ? $reservation->reason : '' }}">
-                    {{ $day->day }}
-                    @if ($plats)
-                        <div class="plat-info">{{ $plats }}</div>
-                    @endif
-                    <!-- Afficher l'icône -->
-                    {!! $icon !!}
-                </div>
+        @if ($day->isSunday())
+            @php
+                $weekStartDate = $day->copy()->startOfWeek()->format('Y-m-d');
+            @endphp
+            <div class="download-container d-flex justify-content-center my-4">
+                <a href="{{ route('download.menu', $weekStartDate) }}"
+                class="btn download-btn d-flex justify-content-center align-items-center"
+                style="width: 60px; height: 60px; border-radius: 50%; background-color: orange; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease;">
+                    <i class="fa-regular fa-file-pdf" style="font-size: 24px; color: #ffffff;"></i>
+                </a>
+            </div>
+        @endif
+    @endforeach
+@endforeach
 
-                @if ($day->isSunday())
-                    @php
-                        $weekStartDate = $day->copy()->startOfWeek()->format('Y-m-d');
-                    @endphp
-                    <div class="download">
-                        <a href="{{ route('download.menu', $weekStartDate) }}" class="btn btn-success download">Télécharger le Menu</a>
-                    </div>
-                @endif
-            @endforeach
-        @endforeach
     </div>
     <div class="icon-legend">
         <div>

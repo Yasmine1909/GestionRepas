@@ -48,10 +48,10 @@
 
             <div class="content">
                 <h3>Découvrez notre solution de réservation de repas en ligne</h3>
-                <p>Bienvenue sur M2M - Votre Solution de Réservation de Repas en Ligne.</p>
+                <p>Bienvenue sur M2M Group - Votre Solution de Réservation de Repas en Ligne.</p>
                 <p class="fst-italic">Notre plateforme facilite la réservation des repas pour les employés, assurant une organisation efficace et sans tracas.</p>
                 <ul>
-                    <li><i class="bx bx-check-double"></i> Gestion complète des réservations : ajout, modification et suppression.</li>
+                    <li><i class="bx bx-check-double"></i> Gestion complète des réservations .</li>
                     <li><i class="bx bx-check-double"></i> Consultation facile et rapide des réservations enregistrées.</li>
                     <li><i class="bx bx-check-double"></i> Notifications personnalisées pour vous informer des mises à jour importantes.</li>
                 </ul>

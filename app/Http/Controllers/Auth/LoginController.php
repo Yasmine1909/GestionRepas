@@ -1,9 +1,5 @@
 <?php
-namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\Request;
 
 namespace App\Http\Controllers\Auth;
 
@@ -25,8 +21,7 @@ class LoginController extends Controller
     // Affiche le formulaire de connexion
     public function showLoginForm()
     {
-      //  return view('auth.login');
-      return redirect('/connexion'); 
+      return redirect('/connexion');
     }
 
     // Gère la déconnexion

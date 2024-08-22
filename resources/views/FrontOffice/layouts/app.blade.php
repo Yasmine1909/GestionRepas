@@ -56,12 +56,14 @@
       </nav><!-- .navbar -->
 
       <!-- Formulaire de déconnexion -->
-      <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-      </form>
+      @auth
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+          @csrf
+        </form>
 
-      <!-- Bouton de déconnexion -->
-      <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="book-a-table-btn scrollto">Déconnexion</a>
+        <!-- Bouton de déconnexion -->
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="book-a-table-btn scrollto">Déconnexion</a>
+      @endauth
 
     </div>
   </header><!-- End Header -->

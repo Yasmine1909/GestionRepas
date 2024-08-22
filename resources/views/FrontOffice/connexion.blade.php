@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="text-center text-secondary mb-4">Connexion au Compte</h1>
-            
+
             <!-- Formulaire de connexion -->
             <form action="{{ route('login') }}" method="post" class="form-group" enctype="multipart/form-data">
                 @csrf
@@ -41,7 +41,6 @@
                             Se souvenir de moi
                         </label>
                     </div>
-                    <a href="{{ route('password.request') }}" class="text-secondary">Mot de passe oublié ?</a>
                 </div>
 
                 <!-- Bouton de Connexion -->

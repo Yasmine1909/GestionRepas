@@ -18,7 +18,7 @@
     <div class="search-bar">
         <form id="searchForm" class="form-inline">
             <input type="date" id="searchDate" class="form-control mr-2" placeholder="Rechercher par date">
-            <button type="button" onclick="filterWeeks()" class="btn btn-primary mt-2">Rechercherrr</button>
+            <button type="button" onclick="filterWeeks()" class="btn btn-primary mt-2">Rechercher</button>
         </form>
     </div>
 

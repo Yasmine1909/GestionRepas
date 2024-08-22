@@ -13,6 +13,7 @@ use App\Http\Controllers\NotificationController;
 use App\Mail\NotificationMail;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ReservationStatsController;
+use App\Http\Controllers\AdminLoginController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,21 +23,25 @@ use App\Http\Controllers\ReservationStatsController;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
-//  la page de connexion
-Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+// */
 
 // Route pour la page de connexion
 Route::get('connexion', [ShowController::class, 'connexion'])->name('connexion');
+
+// Route pour la page de connexion admin
+
+Route::get('admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('admin/login', [AdminLoginController::class, 'login']);
+Route::post('admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 // Authentification
-Auth::routes(); // Génère les routes d'authentification par défaut
+Auth::routes();
 
 // Appliquer le middleware 'auth' à toutes les routes ci-dessous
 Route::middleware(['auth'])->group(function () {
-    // Toutes vos routes nécessitant une authentification
+
     Route::get('/', [ShowController::class, 'show'])->name('home');
     Route::get('menu', [ShowController::class, 'menu']);
-    Route::get('menus', [ShowController::class, 'menus']);
+    Route::get('menus', [ShowController::class, 'menus'])->name('menus');
     Route::post('store', [MenuController::class, 'store'])->name('store');
     Route::get('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'showConfigurationForm'])->name('admin.active_days_configuration');
     Route::post('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'saveConfiguration'])->name('admin.save_active_days_configuration');
@@ -68,7 +73,10 @@ Route::middleware(['auth'])->group(function () {
         Mail::to($user->email)->send(new NotificationMail($notification));
         return 'E-mail envoyé avec succès !';
     });
+
+
 });
 
-// Redirection vers la page d'accueil après connexion
-// Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+
+
