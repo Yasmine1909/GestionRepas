@@ -19,10 +19,18 @@ class NotificationController extends Controller
 {
     public function index()
     {
+        if (Auth::check()) {
+        $this->middleware('auth');
         $userId = Auth::id();
-        $notifications = Notification::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        $notifications = Notification::where('user_id', $userId)
+                                    ->orderBy('created_at', 'desc')
+                                    ->paginate(20);  // Pagination avec 30 notifications par page
 
         return view('FrontOffice.notifications', compact('notifications'));
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
     }
 
     public function storeReservationNotification($reservationId)
@@ -90,7 +98,7 @@ class NotificationController extends Controller
         }
     }
 
-   
+
 
 }
 

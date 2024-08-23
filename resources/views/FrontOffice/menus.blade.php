@@ -25,74 +25,84 @@
     <h1 class="table-title text-center">Tableau de Bord des Menus</h1>
 
     @foreach($weeks as $week)
-        @php
-            $weekStart = \Carbon\Carbon::parse($week->date_debut);
-            $currentDate = \Carbon\Carbon::now();
-            $isCurrentWeek = $weekStart->isSameWeek($currentDate);
-            $canEdit = !$isCurrentWeek && $weekStart->gt($currentDate->startOfWeek()->addDays(4)); // Seules les semaines après le jeudi de la semaine en cours sont modifiables
-        @endphp
+    @php
+        $weekStart = \Carbon\Carbon::parse($week->date_debut);
+        $currentDate = \Carbon\Carbon::now();
+        $currentDayOfWeek = $currentDate->dayOfWeek; // 0 pour dimanche, 1 pour lundi, etc.
 
-        <div class="week-container" data-week-start="{{ $weekStart->format('Y-m-d') }}">
-            <div class="week-title row">
-                <div class="col-6">
-                    Semaine du {{ $weekStart->format('d M Y') }}
-                </div>
-                <div class="col-6 mb-2">
-                    @if($canEdit)
-                    <form action="{{ route('dupliquer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir dupliquer cette semaine ?');">
-                        @csrf
-                        <button type="submit" class="btn btn-success btn-sm">Dupliquer</button>
-                    </form>
-                    <form action="{{ route('supprimer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette semaine ?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Supprimer la Semaine</button>
-                    </form>
-                    @endif
-                    <form action="{{ route('telecharger.menu', $week->id) }}" method="POST" style="display:inline-block;">
-                        @csrf
-                        <button type="submit" class="btn btn-secondary btn-sm">Télécharger Le PDF</button>
-                    </form>
-                </div>
+        $isCurrentWeek = $weekStart->isSameWeek($currentDate);
+
+        if ($currentDayOfWeek >= 1 && $currentDayOfWeek <= 4) { // Du lundi au jeudi
+            $canEdit = $weekStart->isNextWeek(); // Seule la semaine suivante est modifiable
+        } elseif ($currentDayOfWeek >= 5 || $currentDayOfWeek == 0) { // Vendredi à dimanche
+            $canEdit = $weekStart->diffInWeeks($currentDate) == 2; // La semaine après la suivante est modifiable
+        } else {
+            $canEdit = false;
+        }
+    @endphp
+
+    <div class="week-container" data-week-start="{{ $weekStart->format('Y-m-d') }}">
+        <div class="week-title row">
+            <div class="col-6">
+                Semaine du {{ $weekStart->format('d M Y') }}
             </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Date</th>
-                            <th>Jour</th>
-                            <th>Plat</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($week->jours as $jour)
-                            @foreach($jour->plats as $plat)
-                                <tr>
-                                    <td>{{ $weekStart->startOfWeek()->addDays(array_search($jour->jour, ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']))->format('Y-m-d') }}</td>
-                                    <td>{{ $jour->jour }}</td>
-                                    <td>{{ $plat->titre }}</td>
-                                    <td class="actions">
-                                        @if($canEdit)
-                                            <a href="{{ url('modifier_menu/' . $plat->id) }}" class="btn btn-warning btn-sm">Modifier</a>
-                                            <form action="{{ route('destroy', $plat->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce plat ?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                                            </form>
-                                        @else
-                                            <span class="consultation-only">Consultation uniquement</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endforeach
-                    </tbody>
-                </table>
+            <div class="col-6 mb-2">
+                @if($canEdit)
+                <form action="{{ route('dupliquer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir dupliquer cette semaine ?');">
+                    @csrf
+                    <button type="submit" class="btn btn-success btn-sm">Dupliquer</button>
+                </form>
+                <form action="{{ route('supprimer.semaine', $week->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette semaine ?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm">Supprimer la Semaine</button>
+                </form>
+                @endif
+                <form action="{{ route('telecharger.menu', $week->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary btn-sm">Télécharger Le PDF</button>
+                </form>
             </div>
         </div>
-    @endforeach
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Jour</th>
+                        <th>Plat</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($week->jours as $jour)
+                        @foreach($jour->plats as $plat)
+                            <tr>
+                                <td>{{ $weekStart->startOfWeek()->addDays(array_search($jour->jour, ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']))->format('Y-m-d') }}</td>
+                                <td>{{ $jour->jour }}</td>
+                                <td>{{ $plat->titre }}</td>
+                                <td class="actions">
+                                    @if($canEdit)
+                                        <a href="{{ url('modifier_menu/' . $plat->id) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                        <form action="{{ route('destroy', $plat->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce plat ?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                                        </form>
+                                    @else
+                                        <span class="consultation-only">Consultation uniquement</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endforeach
+
 
 </div>
 

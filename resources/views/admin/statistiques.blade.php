@@ -44,67 +44,52 @@
     <div class="row">
         <div class="col-md-4">
             <div class="stat-card">
-                <h5>Total des Utilisateurs</h5>
-                <span id="totalUsers" class="display-4">0</span>
+                <h5> Réservations Confirmées</h5>
+                <span id="totalConfirmedReservations" class="display-4">0</span>
+                <button class="btn btn-success btn-block mb-2" id="downloadConfirmedList">Télécharger la Liste en PDF</button>
+
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
-                <h5>Réservations Confirmées</h5>
-                <span id="confirmedReservations" class="display-4">0</span>
+                <h5>Non Disponibles</h5>
+                <span id="totalNotAvailableReservations" class="display-4">0</span>
+                <button class="btn btn-danger btn-block mb-2" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
+
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
-                <h5>Utilisateurs Non Disponibles</h5>
-                <span id="notAvailableUsers" class="display-4">0</span>
+                <h5>Pas Encore Répondu</h5>
+                <span id="totalNoResponseReservations" class="display-4">0</span>
+                <button class="btn btn-warning btn-block mb-2" id="downloadNoResponseList">Télécharger la Liste en PDF</button>
             </div>
         </div>
     </div>
+
 
     <!-- Listes détaillées avec boutons de téléchargement -->
     <div class="row mt-4">
         <div class="col-md-4">
-            <h5 class="text-center">Réservations Confirmées</h5>
-            <button class="btn btn-success btn-block mb-2" id="downloadConfirmedList">Télécharger la Liste en PDF</button>
-            <ul class="list-group" id="confirmedList">
+            <ul class="list-group" id="confirmedList" style="display: none;">
                 <!-- Liste dynamique -->
             </ul>
         </div>
         <div class="col-md-4">
-            <h5 class="text-center">Utilisateurs Non Disponibles</h5>
-            <button class="btn btn-danger btn-block mb-2" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
-            <ul class="list-group" id="notAvailableList">
+            <ul class="list-group" id="notAvailableList" style="display: none;">
                 <!-- Liste dynamique -->
             </ul>
         </div>
         <div class="col-md-4">
-            <h5 class="text-center">Pas Encore Répondu</h5>
-            <button class="btn btn-warning btn-block mb-2" id="downloadNoResponseList">Télécharger la Liste en PDF</button>
-            <ul class="list-group" id="noResponseList">
+            <ul class="list-group" id="noResponseList" style="display: none;">
                 <!-- Liste dynamique -->
             </ul>
         </div>
     </div>
 
-    <!-- Dashboard pour les dates passées -->
-    <div class="mt-5">
-        <h2 class="text-center mb-4">Historique des Statistiques</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Confirmés</th>
-                        <th>Non Disponibles</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTable">
-                    <!-- Historique dynamique à ajouter -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+  
+
+
 </div>
 
 <!-- jQuery -->
@@ -117,26 +102,27 @@
 <script>
     $(document).ready(function() {
         $('#fetchStatsBtn').click(function() {
-            const selectedDate = $('#selectedDate').val();
+    const selectedDate = $('#selectedDate').val();
 
-            $.ajax({
-                url: '/reservation-stats/fetch',
-                method: 'POST',
-                data: {
-                    date: selectedDate,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(data) {
-                    $('#totalUsers').text(data.totalUsers);
-                    $('#confirmedReservations').text(data.confirmedList.length);
-                    $('#notAvailableUsers').text(data.notAvailableList.length);
+    $.ajax({
+        url: '/reservation-stats/fetch',
+        method: 'POST',
+        data: {
+            date: selectedDate,
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(data) {
+            $('#totalConfirmedReservations').text(data.confirmedList.length);
+            $('#totalNotAvailableReservations').text(data.notAvailableList.length);
+            $('#totalNoResponseReservations').text(data.noResponseList.length);
 
-                    updateList('confirmedList', data.confirmedList);
-                    updateList('notAvailableList', data.notAvailableList);
-                    updateList('noResponseList', data.noResponseList);
-                }
-            });
-        });
+            updateList('confirmedList', data.confirmedList);
+            updateList('notAvailableList', data.notAvailableList);
+            updateList('noResponseList', data.noResponseList);
+        }
+    });
+});
+
 
         $('#downloadConfirmedList').click(function() {
             downloadList('confirmedList', 'Réservations Confirmées');
@@ -221,22 +207,14 @@
     }
 
 
-        function fetchHistory() {
-            $.ajax({
-                url: '/reservation-stats/fetch-history',
-                method: 'GET',
-                success: function(data) {
-                    const tableBody = $('#historyTable');
-                    tableBody.empty();
 
-                    data.forEach(record => {
-                        tableBody.append(`<tr><td>${record.date}</td><td>${record.confirmed}</td><td>${record.not_available}</td></tr>`);
-                    });
-                }
-            });
-        }
 
-        fetchHistory();
+
+
+
+
+
+
     });
 </script>
 

@@ -11,11 +11,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf; // Assurez-vous d'avoir installé le package barryvdh/laravel-dompdf
 
+use Illuminate\Support\Facades\Auth;
 
 class MenuController extends Controller
 {
     public function ajouter_menu()
     {
+        if (Auth::check()) {
         $currentFriday = Carbon::now()->startOfWeek()->addDays(4)->format('Y-m-d');
         $currentDate = Carbon::now()->format('Y-m-d');
         $disabledDays = [];
@@ -44,6 +46,10 @@ class MenuController extends Controller
         }
 
         return view('FrontOffice.ajouter_menu', compact('currentFriday', 'currentDate', 'disabledDays'));
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
     }
 
     public function store(Request $request)
@@ -112,115 +118,45 @@ class MenuController extends Controller
 
 
 
-    //  public function modifierSemaine($id)
-    // {
-    //     $week = Semaine::with('jours.plats')->findOrFail($id);
 
-    //     $activeDays = $week->jours->pluck('jour')->toArray();
-    //     $activeDays = array_map('ucfirst', $activeDays);
-
-    //     return view('BackOffice.modifier_semaine', compact('week', 'activeDays'));
-    // }
-
-    // public function updateWeek(Request $request, $id)
-    // {
-    //     $validatedData = $request->validate([
-    //         'active_days' => 'required|array|min:1',
-    //         'plat_title_lundi' => 'nullable|string|max:255',
-    //         'plat_title_mardi' => 'nullable|string|max:255',
-    //         'plat_title_mercredi' => 'nullable|string|max:255',
-    //         'plat_title_jeudi' => 'nullable|string|max:255',
-    //         'plat_title_vendredi' => 'nullable|string|max:255',
-    //     ]);
-
-    //     $week = Semaine::findOrFail($id);
-
-    //     DB::transaction(function() use ($week, $validatedData) {
-    //         // Récupération des jours déjà existants
-    //         $existingJours = $week->jours->keyBy('jour')->toArray();
-
-    //         $daysMap = [
-    //             'lundi' => 'lundi',
-    //             'mardi' => 'mardi',
-    //             'mercredi' => 'mercredi',
-    //             'jeudi' => 'jeudi',
-    //             'vendredi' => 'vendredi'
-    //         ];
-
-    //         foreach ($validatedData['active_days'] as $day) {
-    //             $dayKey = strtolower($day);
-
-    //             if (!isset($existingJours[$dayKey])) {
-    //                 $jour = new Jour();
-    //                 $jour->semaine_id = $week->id;
-    //                 $jour->jour = $dayKey;
-    //                 $jour->save();
-    //             } else {
-    //                 $jour = $week->jours->firstWhere('jour', $dayKey);
-    //             }
-
-    //             $platTitleKey = 'plat_title_' . $dayKey;
-    //             if (isset($validatedData[$platTitleKey])) {
-    //                 Plat::updateOrCreate(
-    //                     ['jour_id' => $jour->id],
-    //                     ['titre' => $validatedData[$platTitleKey]]
-    //                 );
-    //             }
-    //         }
-
-    //         // Supprimer les jours non sélectionnés
-    //         foreach ($existingJours as $dayKey => $jour) {
-    //             if (!in_array($dayKey, array_map('strtolower', $validatedData['active_days']))) {
-    //                 $jourModel = Jour::where('semaine_id', $week->id)->where('jour', $dayKey)->first();
-    //                 if ($jourModel) {
-    //                     $jourModel->plats()->delete();
-    //                     $jourModel->delete();
-    //                 }
-    //             }
-    //         }
-    //     });
-
-    //     return redirect()->route('modifier_semaine', $week->id)->with('success', 'La semaine a été modifiée avec succès.');
-    // }
     public function showWeeklyMenuForm()
-    {
-        $configuration = ActiveDaysConfiguration::first();
-        $activeDays = $configuration ? $configuration->active_days : [];
+{
+    $configuration = ActiveDaysConfiguration::first();
+    $activeDays = $configuration ? $configuration->active_days : [];
 
-        // Mapping des jours en français vers les constantes de jour de Carbon
-        $daysMapping = [
-            'Lundi' => Carbon::MONDAY,
-            'Mardi' => Carbon::TUESDAY,
-            'Mercredi' => Carbon::WEDNESDAY,
-            'Jeudi' => Carbon::THURSDAY,
-            'Vendredi' => Carbon::FRIDAY,
-        ];
+    // Mapping des jours en français vers les constantes de jour de Carbon
+    $daysMapping = [
+        'Lundi' => Carbon::MONDAY,
+        'Mardi' => Carbon::TUESDAY,
+        'Mercredi' => Carbon::WEDNESDAY,
+        'Jeudi' => Carbon::THURSDAY,
+        'Vendredi' => Carbon::FRIDAY,
+    ];
 
-        $today = Carbon::today();
+    $today = Carbon::today();
 
-        // Calculer le vendredi de la semaine actuelle
-        if ($today->dayOfWeek <= Carbon::FRIDAY) {
-            // Nous sommes avant ou le vendredi de la semaine actuelle
-            $currentFriday = $today->copy()->next(Carbon::FRIDAY);
-        } else {
-            // Nous sommes après le vendredi, donc vendredi de la semaine prochaine
-            $currentFriday = $today->copy()->addWeek()->next(Carbon::FRIDAY);
-        }
-
-        // Calculer le lundi suivant ce vendredi
-        $nextMonday = $currentFriday->copy()->addDay(); // Lundi suivant le vendredi
-
-        $dates = [];
-
-        foreach ($activeDays as $day) {
-            if (isset($daysMapping[$day])) {
-                $date = $nextMonday->copy()->next($daysMapping[$day])->startOfDay();
-                $dates[$day] = $date;
-            }
-        }
-
-        return view('admin.ajouter_menu', compact('dates'));
+    // Calculer le lundi de la semaine à afficher
+    if (in_array($today->dayOfWeek, [Carbon::FRIDAY, Carbon::SATURDAY, Carbon::SUNDAY])) {
+        // Si aujourd'hui est vendredi, samedi ou dimanche, afficher la semaine qui suit la prochaine
+        $nextMonday = $today->copy()->addWeek(2)->startOfWeek(Carbon::MONDAY);
+    } else {
+        // Sinon, afficher la semaine suivante
+        $nextMonday = $today->copy()->addWeek(1)->startOfWeek(Carbon::MONDAY);
     }
+
+    $dates = [];
+
+    foreach ($activeDays as $day) {
+        if (isset($daysMapping[$day])) {
+            $date = $nextMonday->copy()->addDays($daysMapping[$day] - Carbon::MONDAY)->startOfDay();
+            $dates[$day] = $date;
+        }
+    }
+
+    return view('admin.ajouter_menu', compact('dates'));
+}
+
+
 
     public function storeWeeklyMenu(Request $request)
     {

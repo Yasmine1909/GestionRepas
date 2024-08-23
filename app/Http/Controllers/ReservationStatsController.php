@@ -5,12 +5,19 @@ use Illuminate\Http\Request;
 use App\Models\Reservation;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationStatsController extends Controller
 {
+
     public function index()
     {
+        if (Auth::check()) {
         return view('BackOffice.reservation_stats');
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
     }
 
     public function fetchStats(Request $request)

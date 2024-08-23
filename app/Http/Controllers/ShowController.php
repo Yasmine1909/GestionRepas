@@ -6,6 +6,8 @@ use App\Models\Plat;
 use App\Models\Semaine;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 class ShowController extends Controller
 {
@@ -14,7 +16,12 @@ class ShowController extends Controller
         $this->middleware('auth')->except(['connexion', 'show']);
     }
     public function show(){
+        if (Auth::check()) {
         return view('FrontOffice.welcome');
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
     }
 
 
@@ -24,6 +31,7 @@ class ShowController extends Controller
 
     public function menus()
 {
+    if (Auth::check()) {
     $currentDate = Carbon::now();
 
     // Calculer le début et la fin de la semaine courante
@@ -40,6 +48,11 @@ class ShowController extends Controller
     $weeks = Semaine::with('jours.plats')->orderBy('date_debut', 'desc')->get();
 
     return view('FrontOffice.menus', compact('weeks', 'currentDate', 'startOfCurrentWeek', 'endOfCurrentWeek', 'startOfNextWeek', 'endOfCurrentWeekDate'));
+
+} else {
+    // Rediriger ou gérer les utilisateurs non connectés
+    return redirect()->route('login');
+}
 }
 
 
@@ -118,22 +131,32 @@ public function dupliquerSemaine($id)
 
     // Créer une nouvelle semaine en se basant sur la semaine existante
     $nouvelleSemaine = $semaine->replicate();
-    $nouvelleSemaine->date_debut = \Carbon\Carbon::parse($semaine->date_debut)->addWeek()->format('Y-m-d');
-    $nouvelleSemaine->save();
+    $nouvelleSemaine->date_debut = \Carbon\Carbon::parse($semaine->date_debut)->addWeek()->format('Y-m-d'); // Nouvelle date de début (semaine suivante)
+    $nouvelleSemaine->save(); // Sauvegarder la nouvelle semaine
 
-    // Dupliquer les jours et plats
+    // Dupliquer les jours et plats en les associant à la nouvelle semaine
     foreach ($semaine->jours as $jour) {
         $nouveauJour = $jour->replicate();
-        $nouveauJour->semaine_id = $nouvelleSemaine->id;
-        $nouveauJour->save();
+        $nouveauJour->semaine_id = $nouvelleSemaine->id; // Associer le jour à la nouvelle semaine
+
+        // Calculer la nouvelle date du jour en fonction de la nouvelle semaine
+        $nouvelleDateJour = \Carbon\Carbon::parse($nouvelleSemaine->date_debut)
+            ->startOfWeek()
+            ->addDays(array_search($jour->jour, ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']));
+
+        // Mettre à jour la date du jour
+        $nouveauJour->date = $nouvelleDateJour->format('Y-m-d');
+
+        $nouveauJour->save(); // Sauvegarder le nouveau jour
 
         foreach ($jour->plats as $plat) {
             $nouveauPlat = $plat->replicate();
-            $nouveauPlat->jour_id = $nouveauJour->id;
-            $nouveauPlat->save();
+            $nouveauPlat->jour_id = $nouveauJour->id; // Associer le plat au nouveau jour
+            $nouveauPlat->save(); // Sauvegarder le nouveau plat
         }
     }
 
+    // Rediriger vers la page précédente avec un message de succès
     return redirect()->back()->with('success', 'Semaine dupliquée avec succès!');
 }
 
@@ -157,10 +180,20 @@ public function supprimerSemaine($id)
 
 
     public function notifications(){
+        if (Auth::check()) {
         return view('FrontOffice.notifications');
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
     }
     public function statistiques(){
+        if (Auth::check()) {
         return view('admin.statistiques');
+    } else {
+        // Rediriger ou gérer les utilisateurs non connectés
+        return redirect()->route('login');
+    }
     }
 
 }

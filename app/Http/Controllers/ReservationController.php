@@ -18,14 +18,25 @@ class ReservationController extends Controller
 {
     public function index()
 {
+    if (Auth::check()) {
+    $this->middleware('auth');
     $now = Carbon::now();
     $currentDayOfWeek = $now->dayOfWeek;
 
-    // Déterminer la semaine réservable
-    if ($currentDayOfWeek >= Carbon::FRIDAY) {
+    if ($currentDayOfWeek === Carbon::FRIDAY) {
+        // Si aujourd'hui est vendredi, la semaine réservable commence dans deux semaines
+        $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
+        $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
+    } elseif ($currentDayOfWeek === Carbon::SATURDAY) {
+        // Si aujourd'hui est samedi, la semaine réservable commence dans deux semaines
+        $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
+        $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
+    } elseif ($currentDayOfWeek === Carbon::SUNDAY) {
+        // Si aujourd'hui est dimanche, la semaine réservable commence dans deux semaines
         $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
         $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
     } else {
+        // Pour tous les autres jours (lundi à jeudi), la semaine réservable commence la semaine prochaine
         $startOfReservableWeek = $now->copy()->addWeek()->startOfWeek();
         $endOfReservableWeek = $now->copy()->addWeek()->endOfWeek();
     }
@@ -58,6 +69,10 @@ class ReservationController extends Controller
         'reservations' => $reservations,
         'currentWeekEnd' => $endOfReservableWeek
     ]);
+} else {
+    // Rediriger ou gérer les utilisateurs non connectés
+    return redirect()->route('login');
+}
 }
 
 
@@ -105,28 +120,28 @@ class ReservationController extends Controller
 
 
 
-public function validateReservation(Request $request)
-{
-    $data = $request->validate([
-        'date' => 'required|date',
-        'status' => 'required|string',
-        'reason' => 'nullable|string',
-    ]);
+// public function validateReservation(Request $request)
+// {
+//     $data = $request->validate([
+//         'date' => 'required|date',
+//         'status' => 'required|string',
+//         'reason' => 'nullable|string',
+//     ]);
 
-    // Convertir la date en Carbon
-    $date = Carbon::parse($data['date']);
-    $jour = Jour::where('date', $date->format('Y-m-d'))->first();
+//     // Convertir la date en Carbon
+//     $date = Carbon::parse($data['date']);
+//     $jour = Jour::where('date', $date->format('Y-m-d'))->first();
 
-    if ($jour) {
-        $jour->status = $data['status'];
-        $jour->reason = $data['reason'] ?? null;
-        $jour->save();
+//     if ($jour) {
+//         $jour->status = $data['status'];
+//         $jour->reason = $data['reason'] ?? null;
+//         $jour->save();
 
-        return response()->json(['success' => true]);
-    }
+//         return response()->json(['success' => true]);
+//     }
 
-    return response()->json(['success' => false]);
-}
+//     return response()->json(['success' => false]);
+// }
 
     public function store(Request $request)
     {
