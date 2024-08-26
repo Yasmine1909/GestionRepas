@@ -65,7 +65,7 @@ class ShowController extends Controller
 
 
 
-    public function modifier_menu($id)
+public function modifier_menu($id)
 {
     // Trouver le plat par ID
     $plat = Plat::with(['jour.semaine'])->find($id);
@@ -186,8 +186,7 @@ public function supprimerSemaine($id)
 
 
 
-
-    public function notifications(){
+public function notifications(){
         if (Auth::check()) {
         return view('FrontOffice.notifications');
     } else {
@@ -195,13 +194,16 @@ public function supprimerSemaine($id)
         return redirect()->route('login');
     }
     }
-    public function statistiques(){
-        if (Auth::check()) {
+   public function statistiques()
+{
+    if (Auth::check()) {
         return view('admin.statistiques');
     } else {
         // Rediriger ou gérer les utilisateurs non connectés
-        return redirect()->route('login');
+        return redirect()->route('admin.login');
     }
-    }
+}
+
+
 
 }

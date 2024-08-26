@@ -25,17 +25,10 @@
                     <input type="text" class="form-control" id="date" name="date" value="{{ old('date', $date->format('Y-m-d')) }}" disabled>
                 </div>
 
-
-
-                <!-- Sélection du Pack -->
+                <!-- Champ de Texte pour le Plat -->
                 <div class="mb-4">
                     <label for="titre" class="form-label">Plat</label>
-                    <select class="form-select" id="titre" name="titre" required>
-                        <option value="" disabled selected>Choisissez un pack</option>
-                        <option value="Pack1" {{ old('pack', $plat->titre) == 'Pack1' ? 'selected' : '' }}>Pack1</option>
-                        <option value="Pack2" {{ old('pack', $plat->titre) == 'Pack2' ? 'selected' : '' }}>Pack2</option>
-                        <option value="Pack3" {{ old('pack', $plat->titre) == 'Pack3' ? 'selected' : '' }}>Pack3</option>
-                    </select>
+                    <input type="text" class="form-control" id="titre" name="titre" value="{{ old('titre', $plat->titre) }}" required>
                 </div>
 
                 <!-- Boutons de Soumission -->
