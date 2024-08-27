@@ -89,9 +89,13 @@
             </table>
         </div>
     </div>
-@endforeach
+    @endforeach
 
-
+    <!-- Pagination Controls -->
+    <!-- In your Blade view (menus.blade.php) -->
+<div class="pagination" style="justify-content: center;">
+    {{ $weeks->links('vendor.pagination.customm') }}
+</div>
 
 </div>
 

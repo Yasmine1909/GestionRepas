@@ -68,6 +68,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reservation-stats/fetch-history', [ReservationStatsController::class, 'fetchHistory']);
     Route::get('/reservation-stats/history', [ReservationStatsController::class, 'getWeeks']);
     Route::get('/download-week-pdf/{weekId}', [ReservationStatsController::class, 'downloadWeekPdf']);
+    Route::get('/download-confirmed-pdf', [ReservationStatsController::class, 'downloadConfirmedPdf']);
+    Route::get('/download-not-available-pdf', [ReservationStatsController::class, 'downloadNotAvailablePdf']);
+    Route::get('/download-no-response-pdf', [ReservationStatsController::class, 'downloadNoResponsePdf']);
 
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');

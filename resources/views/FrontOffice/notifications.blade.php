@@ -1,4 +1,3 @@
-<!-- resources/views/notifications/index.blade.php -->
 @extends('FrontOffice.layouts.app')
 
 @section('content')
@@ -10,7 +9,7 @@
         }
 
         .container {
-            margin-top: 15%;
+            margin-top: 5%;
         }
 
         .table-title {
@@ -26,6 +25,7 @@
             padding: 1rem;
             border-radius: 0.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
         }
 
         .notification-success {
@@ -36,6 +36,10 @@
         .notification-danger {
             background-color: #f8d7da;
             color: #721c24;
+        }
+
+        .hide {
+            display: none;
         }
 
         .pagination {
@@ -94,12 +98,13 @@
         }
     </style>
 
-    <div class="container">
+    <div class="container" style="margin-top: 12%;">
         <div class="search-bar mb-4">
-            <form id="searchForm" class="form-inline">
-                <input type="text" id="searchText" class="form-control mr-2" placeholder="Rechercher par date ou plat">
-                <button type="button" onclick="filterNotifications()" class="btn btn-primary mt-2">Rechercher</button>
+            <form action="{{ route('notifications.search') }}" method="GET" class="form-inline">
+                <input type="text" name="query" class="form-control mr-2" placeholder="Rechercher par date ou plat">
+                <button type="submit" class="btn btn-primary mt-2">Rechercher</button>
             </form>
+
         </div>
 
         <h1 class="table-title text-center">Notifications</h1>
@@ -123,18 +128,4 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <script>
-        function filterNotifications() {
-            const searchText = document.getElementById('searchText').value.toLowerCase();
-            const notifications = document.querySelectorAll('.notification');
-            notifications.forEach(notification => {
-                const text = notification.textContent.toLowerCase();
-                if (text.includes(searchText)) {
-                    notification.classList.remove('hide');
-                } else {
-                    notification.classList.add('hide');
-                }
-            });
-        }
-    </script>
 @endsection

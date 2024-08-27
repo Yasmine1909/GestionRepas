@@ -141,19 +141,21 @@ $(document).ready(function() {
     });
 
     $('#downloadConfirmedList').click(function() {
-        const selectedDate = $('#selectedDate').val();
-        downloadList('confirmedList', 'Réservations Confirmées', selectedDate);
-    });
+    const selectedDate = $('#selectedDate').val();
+    window.location.href = `/download-confirmed-pdf?date=${selectedDate}`;
+});
 
-    $('#downloadNotAvailableList').click(function() {
-        const selectedDate = $('#selectedDate').val();
-        downloadList('notAvailableList', 'Utilisateurs Non Disponibles', selectedDate);
-    });
 
-    $('#downloadNoResponseList').click(function() {
-        const selectedDate = $('#selectedDate').val();
-        downloadList('noResponseList', 'Pas Encore Répondu', selectedDate);
-    });
+$('#downloadNotAvailableList').click(function() {
+    const selectedDate = $('#selectedDate').val();
+    window.location.href = '/download-not-available-pdf?date=' + encodeURIComponent(selectedDate);
+});
+
+$('#downloadNoResponseList').click(function() {
+    const selectedDate = $('#selectedDate').val();
+    window.location.href = '/download-no-response-pdf?date=' + encodeURIComponent(selectedDate);
+});
+
 
     function updateList(listId, items) {
         const list = $('#' + listId);

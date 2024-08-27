@@ -7,20 +7,17 @@ use App\Models\User;
 use App\Models\Semaine;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
-
 use Illuminate\Support\Facades\Auth;
 
 class ReservationStatsController extends Controller
 {
-
     public function index()
     {
         if (Auth::check()) {
-        return view('BackOffice.reservation_stats');
-    } else {
-        // Rediriger ou gérer les utilisateurs non connectés
-        return redirect()->route('login');
-    }
+            return view('BackOffice.reservation_stats');
+        } else {
+            return redirect()->route('login');
+        }
     }
 
     public function fetchStats(Request $request)
@@ -62,7 +59,6 @@ class ReservationStatsController extends Controller
                     'reason' => $user->reason // Assurez-vous que 'reason' est bien défini dans le modèle User
                 ];
             }),
-
             'noResponseList' => $noResponseUsers->map(function($user) {
                 return [
                     'name' => $user->name,
@@ -96,37 +92,103 @@ class ReservationStatsController extends Controller
 
         return response()->json($data);
     }
+
     public function getWeeks(Request $request)
+    {
+        $perPage = 5; // Nombre de semaines par page
+        $page = $request->input('page', 1); // Numéro de la page, par défaut 1
+        $weeks = Semaine::orderBy('date_debut', 'desc')->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json($weeks);
+    }
+
+    public function downloadWeekPdf($weekId)
+    {
+        // Récupère la semaine avec les jours, plats et réservations associés
+        $week = Semaine::with('jours.plats.reservations')->findOrFail($weekId);
+
+        // Préparer les données pour le PDF
+        $data = [
+            'week' => $week
+        ];
+
+        // Charge la vue PDF avec les données
+        $pdf = PDF::loadView('pdf.weekly-menu', $data);
+
+        return $pdf->download('menu-semaine-'.$week->date_debut.'.pdf');
+    }
+
+    public function downloadConfirmedPdf(Request $request)
+    {
+        $date = $request->input('date');
+
+        // Fetch reservations based on the date
+        $reservations = $this->fetchReservationsByDate($date);
+
+        // Prepare data for the PDF
+        $data = [
+            'reservations' => $reservations,
+            'date' => $date
+        ];
+
+        // Load the view and generate the PDF
+        $pdf = PDF::loadView('pdf.confirmed-reservations', $data);
+
+        return $pdf->download('confirmed-reservations-'.$date.'.pdf');
+    }
+
+    // Define the method to fetch reservations by date
+    private function fetchReservationsByDate($date)
+    {
+        return Reservation::whereDate('date', $date)
+            ->where('status', 'available')
+            ->get();
+    }
+
+    public function downloadNotAvailablePdf(Request $request)
+    {
+        $date = $request->input('date');
+        $reservations = $this->fetchReservationsByStatus($date, 'unavailable'); // Assume this method fetches reservations by status
+
+        $pdf = PDF::loadView('pdf.not-available-reservations', [
+            'reservations' => $reservations,
+            'selectedDate' => $date,
+            'totalCount' => $reservations->count()
+        ]);
+
+        return $pdf->download('not-available-reservations-'.$date.'.pdf');
+    }
+
+    public function downloadNoResponsePdf(Request $request)
 {
-    $perPage = 5; // Nombre de semaines par page
-    $page = $request->input('page', 1); // Numéro de la page, par défaut 1
-    $weeks = Semaine::orderBy('date_debut', 'desc')->paginate($perPage, ['*'], 'page', $page);
+    $date = $request->input('date');
 
-    return response()->json($weeks);
+    // Fetch users who do not have reservations for the given date
+    $usersWithNoResponse = $this->fetchUsersWithNoResponse($date);
+
+    $pdf = PDF::loadView('pdf.no-response-reservations', [
+        'reservations' => $usersWithNoResponse,
+        'selectedDate' => $date,
+        'totalCount' => $usersWithNoResponse->count()
+    ]);
+
+    return $pdf->download('no-response-reservations-'.$date.'.pdf');
 }
-//ouahiba, yasmine
 
-public function downloadWeekPdf($weekId)
+private function fetchUsersWithNoResponse($date)
 {
-    // Récupère la semaine avec les jours, plats et réservations associés
-    $week = Semaine::with('jours.plats.reservations')->findOrFail($weekId);
+    // Get users who have no reservations for the specified date
+    $usersWithReservations = Reservation::whereDate('date', $date)
+        ->pluck('user_id');
 
-    // Préparer les données pour le PDF
-    $data = [
-        'week' => $week
-    ];
-
-    // Charge la vue PDF avec les données
-    $pdf = PDF::loadView('pdf.weekly-menu', $data);
-
-    return $pdf->download('menu-semaine-'.$week->date_debut.'.pdf');
+    return User::whereNotIn('id', $usersWithReservations)->get();
 }
 
 
-
-
-
-
-
-
+    private function fetchReservationsByStatus($date, $status)
+    {
+        return Reservation::whereDate('date', $date)
+            ->where('status', $status)
+            ->get();
+    }
 }

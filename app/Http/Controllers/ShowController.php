@@ -30,34 +30,38 @@ class ShowController extends Controller
     }
 
     public function menus()
-{
-    if (Auth::check()) {
-        $currentDate = Carbon::now();
-        $currentDayOfWeek = $currentDate->dayOfWeek;
+    {
+        if (Auth::check()) {
+            $currentDate = Carbon::now();
+            $currentDayOfWeek = $currentDate->dayOfWeek;
 
-        // Début de la semaine courante (Lundi)
-        $startOfCurrentWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
+            // Début de la semaine courante (Lundi)
+            $startOfCurrentWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
 
-        if ($currentDayOfWeek == Carbon::FRIDAY) {
-            // Si on est vendredi, les semaines actives commencent après la semaine suivante
-            $activeWeeksStart = $startOfCurrentWeek->copy()->addWeeks(2);
-        } elseif ($currentDayOfWeek == Carbon::SATURDAY || $currentDayOfWeek == Carbon::SUNDAY) {
-            // Si on est samedi ou dimanche, les semaines actives commencent après la semaine suivante
-            $activeWeeksStart = $startOfCurrentWeek->copy()->addWeeks(2);
+            if ($currentDayOfWeek == Carbon::FRIDAY) {
+                // Si on est vendredi, les semaines actives commencent après la semaine suivante
+                $activeWeeksStart = $startOfCurrentWeek->copy()->addWeeks(2);
+            } elseif ($currentDayOfWeek == Carbon::SATURDAY || $currentDayOfWeek == Carbon::SUNDAY) {
+                // Si on est samedi ou dimanche, les semaines actives commencent après la semaine suivante
+                $activeWeeksStart = $startOfCurrentWeek->copy()->addWeeks(2);
+            } else {
+                // Pour les autres jours (lundi à jeudi), les semaines actives commencent la semaine suivante
+                $activeWeeksStart = $startOfCurrentWeek->copy()->addWeek();
+            }
+
+            // Paginer les semaines
+            $weeks = Semaine::with('jours.plats')
+                            ->orderBy('date_debut', 'desc')
+                            ->paginate(6); // Pagination de 6 semaines par page
+
+            return view('FrontOffice.menus', compact('weeks', 'currentDate', 'activeWeeksStart'));
         } else {
-            // Pour les autres jours (lundi à jeudi), les semaines actives commencent la semaine suivante
-            $activeWeeksStart = $startOfCurrentWeek->copy()->addWeek();
+            // Rediriger ou gérer les utilisateurs non connectés
+            return redirect()->route('admin.login');
         }
-
-        // Récupérer les semaines avec les jours et plats
-        $weeks = Semaine::with('jours.plats')->orderBy('date_debut', 'desc')->get();
-
-        return view('FrontOffice.menus', compact('weeks', 'currentDate', 'activeWeeksStart'));
-    } else {
-        // Rediriger ou gérer les utilisateurs non connectés
-        return redirect()->route('admin.login');
     }
-}
+
+
 
 
 

@@ -8,26 +8,47 @@
 
 
 <style>
+    body {
+        background-color: #f5f5f5;
+        font-family: 'Helvetica Neue', sans-serif;
+        color: #333;
+    }
+    .container {
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    }
     .calendar {
         display: grid;
         grid-template-columns: repeat(8, 1fr);
         gap: 1px;
         background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        max-width: 800px;
-        margin: auto;
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+        margin-top: 30px;
+        max-width: 90%;
+    margin: 0 auto;
+    }
+    h1 {
+        color: #0d4a75;
+        font-weight: bold;
+        font-size: 2.5rem;
     }
     .calendar div {
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #dee2e6;
-        background-color: #ffffff;
-        transition: background-color 0.3s, color 0.3s;
-    }
+    padding: 10px;
+    text-align: center;
+    background-color: #ffffff;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.85rem; /* Réduire la taille de la police pour plus de compacité */
+}
+
     .calendar .header {
-        background-color: #007bff;
+        background-color: #0d4a75;
         color: #ffffff;
         font-weight: bold;
+        padding: 10px 5px;
     }
     .calendar .clickable {
         cursor: pointer;
@@ -37,21 +58,22 @@
         color: #ffffff;
     }
     .calendar .disabled {
-        background-color: #f1f1f1;
-        color: #c0c0c0;
+        background-color: #e9ecef;
+        color: #adb5bd;
     }
     .calendar .download {
-        background-color: #28a745;
+        background-color: #007bff;
         color: #ffffff;
         cursor: pointer;
         text-align: center;
+        padding: 10px;
         transition: background-color 0.3s;
     }
     .calendar .download:hover {
-        background-color: #218838;
+        background-color: #0056b3;
     }
     .modal-body {
-        padding: 1.5rem;
+        padding: 2rem;
     }
     .modal-header {
         background-color: #007bff;
@@ -64,12 +86,24 @@
     .plat-info {
         font-size: 0.9rem;
         color: #6c757d;
-        margin-top: 5px;
+        margin-top: 10px;
     }
     .btn-custom {
         background-color: #007bff;
         color: #ffffff;
         transition: background-color 0.3s;
+    }
+    .btn-custom, .reserve-week-btn {
+        background-color:  #0056b3;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        transition: background-color 0.3s;
+        margin: 10px;
+    }
+    .reserve-week-btn:hover {
+        background-color: #007bff;
     }
     .btn-custom:hover {
         background-color: #0056b3;
@@ -121,21 +155,8 @@
     background-color: #ffc107; /* Couleur orange pour les jours réservés de la semaine suivante */
     color: #ffffff;
 }
-    .reserve-week-btn {
-        position: absolute;
-        left: -50px;
-        top: 380px;
 
-        background-color: #007bff;
-        color: #ffffff;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    .reserve-week-btn:hover {
-        background-color: #0056b3;
-    }
+
 
     .calendar .reserved {
         background-color: #ffc107; /* Couleur pour les jours réservés */

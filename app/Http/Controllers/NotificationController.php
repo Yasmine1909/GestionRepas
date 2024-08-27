@@ -97,6 +97,28 @@ class NotificationController extends Controller
             Log::error('Erreur lors de la création de la notification ou de l\'envoi de l\'email : ' . $e->getMessage());
         }
     }
+    public function search(Request $request)
+{
+    // Vérifier que l'utilisateur est connecté
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    $userId = Auth::id(); // Obtenir l'ID de l'utilisateur connecté
+    $query = $request->input('query');
+
+    // Filtrer les notifications de l'utilisateur connecté et par recherche
+    $notifications = Notification::where('user_id', $userId)
+                                  ->where(function($q) use ($query) {
+                                      $q->where('message', 'LIKE', "%$query%")
+                                        ->orWhereDate('created_at', 'LIKE', "%$query%");
+                                  })
+                                  ->orderBy('created_at', 'desc')
+                                  ->paginate(20);
+
+    return view('FrontOffice.notifications', compact('notifications'));
+}
+
 
 
 
