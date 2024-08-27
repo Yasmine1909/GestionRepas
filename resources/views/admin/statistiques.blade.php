@@ -44,10 +44,9 @@
     <div class="row">
         <div class="col-md-4">
             <div class="stat-card">
-                <h5> Réservations Confirmées</h5>
+                <h5>Réservations Confirmées</h5>
                 <span id="totalConfirmedReservations" class="display-4">0</span>
                 <button class="btn btn-success btn-block mb-2" id="downloadConfirmedList">Télécharger la Liste en PDF</button>
-
             </div>
         </div>
         <div class="col-md-4">
@@ -55,7 +54,6 @@
                 <h5>Non Disponibles</h5>
                 <span id="totalNotAvailableReservations" class="display-4">0</span>
                 <button class="btn btn-warning btn-block mb-2" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
-
             </div>
         </div>
         <div class="col-md-4">
@@ -66,7 +64,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Listes détaillées avec boutons de téléchargement -->
     <div class="row mt-4">
@@ -87,8 +84,28 @@
         </div>
     </div>
 
-
-
+    <!-- Tableau des semaines avec bouton de téléchargement PDF -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h2 class="text-center mb-4">Historique des Semaines</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Semaine du:</th>
+                        <th>Télécharger le PDF</th>
+                    </tr>
+                </thead>
+                <tbody id="weeksTableBody">
+                    <!-- Les lignes de tableau seront ajoutées dynamiquement ici -->
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination" id="pagination" style="justify-content: center;">
+                    <!-- Pagination sera ajoutée dynamiquement ici -->
+                </ul>
+            </nav>
+        </div>
+    </div>
 
 </div>
 
@@ -100,59 +117,61 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#fetchStatsBtn').click(function() {
-    const selectedDate = $('#selectedDate').val();
+$(document).ready(function() {
+    $('#fetchStatsBtn').click(function() {
+        const selectedDate = $('#selectedDate').val();
 
-    $.ajax({
-        url: '/reservation-stats/fetch',
-        method: 'POST',
-        data: {
-            date: selectedDate,
-            _token: '{{ csrf_token() }}'
-        },
-        success: function(data) {
-            $('#totalConfirmedReservations').text(data.confirmedList.length);
-            $('#totalNotAvailableReservations').text(data.notAvailableList.length);
-            $('#totalNoResponseReservations').text(data.noResponseList.length);
+        $.ajax({
+            url: '/reservation-stats/fetch',
+            method: 'POST',
+            data: {
+                date: selectedDate,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(data) {
+                $('#totalConfirmedReservations').text(data.confirmedList.length);
+                $('#totalNotAvailableReservations').text(data.notAvailableList.length);
+                $('#totalNoResponseReservations').text(data.noResponseList.length);
 
-            updateList('confirmedList', data.confirmedList);
-            updateList('notAvailableList', data.notAvailableList);
-            updateList('noResponseList', data.noResponseList);
-        }
+                updateList('confirmedList', data.confirmedList);
+                updateList('notAvailableList', data.notAvailableList);
+                updateList('noResponseList', data.noResponseList);
+            }
+        });
     });
-});
 
+    $('#downloadConfirmedList').click(function() {
+        const selectedDate = $('#selectedDate').val();
+        downloadList('confirmedList', 'Réservations Confirmées', selectedDate);
+    });
 
-        $('#downloadConfirmedList').click(function() {
-            downloadList('confirmedList', 'Réservations Confirmées');
+    $('#downloadNotAvailableList').click(function() {
+        const selectedDate = $('#selectedDate').val();
+        downloadList('notAvailableList', 'Utilisateurs Non Disponibles', selectedDate);
+    });
+
+    $('#downloadNoResponseList').click(function() {
+        const selectedDate = $('#selectedDate').val();
+        downloadList('noResponseList', 'Pas Encore Répondu', selectedDate);
+    });
+
+    function updateList(listId, items) {
+        const list = $('#' + listId);
+        list.empty();
+
+        items.forEach(item => {
+            const statusClass = item.status === 'Confirmé' ? 'success' : item.status === 'Non Disponible' ? 'danger' : 'warning';
+            const reasonText = item.reason ? ` - Raison: ${item.reason}` : ''; // Texte de la raison s'il existe
+            list.append(`
+                <li class="list-group-item" data-email="${item.email}" data-reason="${item.reason}">
+                    ${item.name} ${item.last_name} - ${item.email}${reasonText}
+                    <span class="badge badge-${statusClass}">${item.status}</span>
+                </li>
+            `);
         });
+    }
 
-        $('#downloadNotAvailableList').click(function() {
-            downloadList('notAvailableList', 'Utilisateurs Non Disponibles');
-        });
-
-        $('#downloadNoResponseList').click(function() {
-            downloadList('noResponseList', 'Pas Encore Répondu');
-        });
-
-        function updateList(listId, items) {
-            const list = $('#' + listId);
-            list.empty();
-
-            items.forEach(item => {
-                // Affichage en HTML avec les données dans les attributs data-*
-                const statusClass = item.status === 'Confirmé' ? 'success' : item.status === 'Non Disponible' ? 'danger' : 'warning';
-                list.append(`
-                    <li class="list-group-item" data-email="${item.email}">
-                        ${item.name} ${item.last_name}
-                        <span class="badge badge-${statusClass}">${item.status}</span>
-                    </li>
-                `);
-            });
-        }
-
-        function downloadList(listId, title) {
+    function downloadList(listId, title, selectedDate) {
         const list = document.getElementById(listId);
         const items = list.getElementsByTagName('li');
 
@@ -160,62 +179,121 @@
         const doc = new jsPDF();
         const margins = { top: 20, left: 15, bottom: 15 };
         const lineHeight = 10;
-        const pageWidth = 210;
-        const columnWidths = [30, 60, 80]; // Largeur des colonnes : Prénom, Nom, Email
 
+        // Date actuelle
+        const currentDate = new Date().toLocaleDateString();
+
+        // Titre du document
         doc.setFontSize(16);
         doc.setFont("helvetica", "bold");
         doc.text(title, margins.left, margins.top);
 
+        // Information de la date sélectionnée et la date de téléchargement
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         doc.text(`Nombre de Personnes Dans cette Liste: ${items.length}`, margins.left, margins.top + 10);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, margins.left, margins.top + 20);
+        doc.text(`Date choisie: ${selectedDate}`, margins.left, margins.top + 20);
+        doc.text(`Téléchargé le: ${currentDate}`, margins.left, margins.top + 30);
 
-        let y = margins.top + 30;
-        doc.setFont("helvetica", "bold");
-
-        // Dessin des en-têtes avec cadres
-        doc.text('Prénom', margins.left, y);
-        doc.text('Nom', margins.left + columnWidths[0], y);
-        doc.text('Email', margins.left + columnWidths[0] + columnWidths[1], y);
-
-        // Dessin des cadres pour les en-têtes
-        doc.rect(margins.left - 1, y - 10, columnWidths[0] + columnWidths[1] + columnWidths[2] + 2, 10); // Cadre autour des en-têtes
-        doc.rect(margins.left - 1, y, columnWidths[0], lineHeight); // Cadre pour 'Prénom'
-        doc.rect(margins.left + columnWidths[0] - 1, y, columnWidths[1], lineHeight); // Cadre pour 'Nom'
-        doc.rect(margins.left + columnWidths[0] + columnWidths[1] - 1, y, columnWidths[2], lineHeight); // Cadre pour 'Email'
-
-        y += lineHeight;
+        let y = margins.top + 40;
 
         doc.setFont("helvetica", "normal");
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             const email = item.getAttribute('data-email');
             const name = item.textContent.trim().split(/\s+/);
+            const status = item.querySelector('.badge').textContent.trim(); // Trim pour éviter les erreurs d'espace
+            const reason = item.getAttribute('data-reason'); // Récupération de la raison
 
-            doc.text(name[0], margins.left, y);
-            doc.text(name[1], margins.left + columnWidths[0], y);
-            doc.text(email, margins.left + columnWidths[0] + columnWidths[1], y);
+            // Affichage des données : Nom, Prénom, Email
+            doc.text(`${name[0]} ${name[1]} - ${email}`, margins.left, y);
 
-            // Dessin des cadres pour les lignes de données
-            doc.rect(margins.left - 1, y - 5, columnWidths[0] + columnWidths[1] + columnWidths[2] + 2, lineHeight); // Cadre autour de chaque ligne
+            // Si le statut est 'Non Disponible', ajouter la raison
+            if (status === 'Non Disponible' && reason) {
+                y += lineHeight;
+                doc.text(`Raison: ${reason}`, margins.left, y);
+            }
+
             y += lineHeight;
+
+            // Si la page est pleine, ajouter une nouvelle page
+            if (y > doc.internal.pageSize.height - margins.bottom) {
+                doc.addPage();
+                y = margins.top;
+            }
         }
 
         doc.save(`${listId}.pdf`);
     }
 
+    let currentPage = 1;
 
+function loadWeeks(page = 1) {
+    $.ajax({
+        url: '/reservation-stats/history',
+        method: 'GET',
+        data: { page: page },
+        success: function(response) {
+            const tableBody = $('#weeksTableBody');
+            const pagination = $('#pagination');
+            tableBody.empty();
+            pagination.empty();
 
+            // Ajouter les semaines au tableau
+            response.data.forEach(week => {
+                tableBody.append(`
+                    <tr>
+                        <td>${week.date_debut}</td>
+                        <td><a href="/download-week-pdf/${week.id}" class="btn btn-primary btn-sm">Télécharger</a></td>
+                    </tr>
+                `);
+            });
 
+            // Ajouter la pagination
+            if (response.last_page > 1) {
+                // Page précédente
+                if (response.current_page > 1) {
+                    pagination.append(`
+                        <li class="page-item">
+                            <a class="page-link" href="#" data-page="${response.current_page - 1}">&laquo; Précédent</a>
+                        </li>
+                    `);
+                }
 
+                // Pages numérotées
+                for (let i = 1; i <= response.last_page; i++) {
+                    const activeClass = i === response.current_page ? 'active' : '';
+                    pagination.append(`
+                        <li class="page-item ${activeClass}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `);
+                }
 
-
-
-
-
+                // Page suivante
+                if (response.current_page < response.last_page) {
+                    pagination.append(`
+                        <li class="page-item">
+                            <a class="page-link" href="#" data-page="${response.current_page + 1}">Suivant &raquo;</a>
+                        </li>
+                    `);
+                }
+            }
+        }
     });
-</script>
+}
 
+
+    loadWeeks();
+    // Gestion des clics sur les boutons de pagination
+    $(document).on('click', '.page-link', function(e) {
+        e.preventDefault();
+        const page = $(this).data('page');
+        if (page) {
+            currentPage = page;
+            loadWeeks(page);
+        }
+    });
+});
+</script>
 @endsection

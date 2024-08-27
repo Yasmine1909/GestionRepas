@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Dernier Rappel</title>
+    <title>Dernier Rappel de Réservation</title>
 </head>
 <body>
-    <p>Dernier Rappel pour La Réservation de la Prochaine Semaine !</p>
+    <p>Bonjour,</p>
+    <p>Ceci est un dernier rappel pour indiquer votre disponibilité pour les jours de la semaine prochaine.</p>
+    <p>Merci de remplir vos disponibilités avant la fin de la journée.</p>
+    <p>Merci,</p>
+    <p>M2M Group</p>
 </body>
 </html>

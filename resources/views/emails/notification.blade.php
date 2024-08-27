@@ -46,7 +46,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Notification Importante</h1>
+            <h1>Notification de Confirmation</h1>
         </div>
         <div class="content">
             <p>{{ $notification->message }}</p>
@@ -54,7 +54,7 @@
         </div>
         <div class="footer">
             <p>Merci de votre attention.</p>
-            <p><strong>{{ config('app.name') }}</strong></p>
+            <p><strong>M2M Group</strong></p>
         </div>
     </div>
 </body>

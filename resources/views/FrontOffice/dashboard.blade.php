@@ -1,7 +1,7 @@
 
 
 @extends('FrontOffice.layouts.app')
-
+@section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -187,7 +187,7 @@
 }
 
 </style>
-@section('content')
+
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -230,9 +230,9 @@
             $hasPlats = !empty($plats);
             $dayClass = '';
 
-            if ($day->isSaturday() || $day->isSunday()) {
-                $dayClass .= 'weekend ';
-            }
+            // if ($day->isSaturday() || $day->isSunday()) {
+            //     $dayClass .= 'weekend ';
+            // }
 
             if ($isReservableWeek) {
                 $dayClass .= 'reservable-week ';
@@ -433,6 +433,9 @@
                   if (response.success) {
                       $('.calendar .clickable[data-date="' + date + '"]').addClass('reserved');
                       $('#modalMessage').text(status === 'available' ? 'Vous avez confirmé votre disponibilité' : 'Vous avez confirmé votre non disponibilité pour raison: ' + reason);
+                      setTimeout(function() {
+                        location.reload();
+                    }, 1000); // Délai de 1 seconde avant le rechargement
                   }
                   $('#menuModal').modal('hide');
               },
@@ -459,7 +462,11 @@
               },
               success: function(response) {
                   $('.calendar .clickable[data-date="' + date + '"]').removeClass('reserved');
-                  $('#modalMessage').text('');
+                  $('#modalMessage').text('Votre réservation a été annulée.');
+                    // Recharger la page après une annulation réussie
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                   $('#menuModal').modal('hide');
               },
               error: function(response) {
@@ -497,6 +504,9 @@
                         $('.calendar .clickable[data-date="' + day.date + '"]').addClass('reserved');
                     });
                     alert('Tous les jours disponibles pour la semaine ont été réservés.');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                 } else {
                     alert('Erreur lors de la réservation de la semaine.');
                 }
@@ -568,114 +578,6 @@ function cancelReservation(date) {
   });
   </script>
 
-  {{-- <script> --}}
-    {{-- $(document).ready(function() {
-        $('.clickable').on('click', function() {
-            var date = $(this).data('date');
-            var plats = $(this).data('plats');
-            var status = $(this).data('status'); // Assurez-vous que ces données sont passées
-            var reason = $(this).data('reason'); // Assurez-vous que ces données sont passées
-            var isReserved = $(this).hasClass('reserved');
-
-            $('#menuDate').text(date);
-            $('#menuPlats').text(plats);
-
-            if (isReserved) {
-                $('#reservationOptions').hide();
-                $('#reserveBtn').hide();
-                $('#cancelButton').show();
-
-                if (status === 'unavailable') {
-                    $('#nonAvailabilityReason').show();
-                    $('#reasonSelect').val(reason); // Prend la valeur de la raison de non-disponibilité
-                    $('#modalMessage').text('Vous avez confirmé votre non disponibilité pour raison: ' + reason);
-                } else {
-                    $('#nonAvailabilityReason').hide();
-                    $('#modalMessage').text('Vous avez confirmé votre disponibilité');
-                }
-            } else {
-                $('#reservationOptions').show();
-                $('#reserveBtn').show();
-                $('#cancelButton').hide();
-                $('#nonAvailabilityReason').hide();
-                $('#modalMessage').text('');
-            }
-
-            $('#availableRadio').prop('checked', status === 'available');
-            $('#notAvailableRadio').prop('checked', status === 'unavailable');
-
-            $('#menuModal').modal('show');
-        });
-
-        // Option pour la raison de non-disponibilité
-        $('input[name="status"]').change(function() {
-            if ($(this).val() === 'unavailable') {
-                $('#nonAvailabilityReason').show();
-            } else {
-                $('#nonAvailabilityReason').hide();
-            }
-        });
-
-        // Gestion des boutons de réservation et d'annulation
-        $('#reserveBtn').on('click', function() {
-            var date = $('#menuDate').text();
-            var status = $('input[name="status"]:checked').val();
-            var reason = $('#reasonSelect').val();
-
-            $.ajax({
-                url: '{{ route('reserve') }}',
-                type: 'POST',
-                data: {
-                    date: date,
-                    status: status,
-                    reason: reason,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('.calendar .clickable[data-date="' + date + '"]').addClass('reserved');
-                        $('#modalMessage').text(status === 'available' ? 'Vous avez confirmé votre disponibilité' : 'Vous avez confirmé votre non disponibilité pour raison: ' + reason);
-                    }
-                    $('#menuModal').modal('hide');
-                },
-                error: function(xhr) {
-                    var errorMsg = 'Erreur lors de la réservation.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    }
-                    alert(errorMsg);
-                    $('#menuModal').modal('hide');
-                }
-            });
-        });
-
-        $('#cancelButton').on('click', function() {
-            var date = $('#menuDate').text();
-
-            $.ajax({
-                url: '{{ route("reservations.cancel") }}',
-                type: 'POST',
-                data: {
-                    date: date,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    $('.calendar .clickable[data-date="' + date + '"]').removeClass('reserved');
-                    $('#modalMessage').text('Réservation annulée pour la date: ' + date);
-                    $('#menuModal').modal('hide');
-                },
-                error: function(response) {
-                    var errorMsg = 'Erreur lors de l\'annulation.';
-                    if (response.responseJSON && response.responseJSON.message) {
-                        errorMsg = response.responseJSON.message;
-                    }
-                    alert(errorMsg);
-                    $('#menuModal').modal('hide');
-                }
-            });
-        });
-    });
-    </script> --}}
 
 
 

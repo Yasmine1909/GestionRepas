@@ -61,18 +61,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reservations/validate', [ReservationController::class, 'validateReservation'])->name('reservations.validate');
     Route::post('/reservations/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::post('/reserve-week', [ReservationController::class, 'reserveWeek'])->name('reserve.week');
+
     Route::get('statistiques', [ShowController::class, 'statistiques']);
     Route::get('/reservation-stats', [ReservationStatsController::class, 'index']);
     Route::post('/reservation-stats/fetch', [ReservationStatsController::class, 'fetchStats']);
     Route::get('/reservation-stats/fetch-history', [ReservationStatsController::class, 'fetchHistory']);
+    Route::get('/reservation-stats/history', [ReservationStatsController::class, 'getWeeks']);
+    Route::get('/download-week-pdf/{weekId}', [ReservationStatsController::class, 'downloadWeekPdf']);
+
+
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::get('/notifications/search', [NotificationController::class, 'search'])->name('notifications.search');
-    Route::get('/test-email', function () {
-        $user = Auth::user(); // Assurez-vous que vous êtes connecté ou remplacez ceci par un utilisateur fictif
-        $notification = App\Models\Notification::first(); // Utilisez une notification existante ou créez-en une pour tester
-        Mail::to($user->email)->send(new NotificationMail($notification));
-        return 'E-mail envoyé avec succès !';
-    });
+
 
 
 });

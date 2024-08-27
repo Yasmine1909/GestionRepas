@@ -15,4 +15,8 @@ class Plat extends Model
     {
         return $this->belongsTo(Jour::class);
     }
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }

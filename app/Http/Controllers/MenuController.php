@@ -17,114 +17,120 @@ class MenuController extends Controller
     public function ajouter_menu()
     {
         if (Auth::check()) {
-            $currentFriday = Carbon::now()->startOfWeek()->addDays(4)->format('Y-m-d');
-            $currentDate = Carbon::now()->format('Y-m-d');
-            $disabledDays = [];
-            $selectedWeek = request()->input('week_start');
+            // Déterminer la date actuelle et la semaine à afficher
+            $today = Carbon::today();
+            $currentDayOfWeek = $today->dayOfWeek;
 
-            if ($selectedWeek) {
-                try {
-                    $weekStartDate = Carbon::parse($selectedWeek . '-1');
-                    $weekStartFormatted = $weekStartDate->startOfWeek()->format('Y-m-d');
-                    $week = Semaine::where('date_debut', $weekStartFormatted)->first();
-
-                    if ($week) {
-                        $jours = Jour::where('semaine_id', $week->id)->pluck('jour')->toArray();
-                        $daysMap = [
-                            'lundi' => 'Lundi',
-                            'mardi' => 'Mardi',
-                            'mercredi' => 'Mercredi',
-                            'jeudi' => 'Jeudi',
-                            'vendredi' => 'Vendredi'
-                        ];
-                        $disabledDays = array_map(function($day) use ($daysMap) {
-                            return $daysMap[$day];
-                        }, $jours);
-                    }
-                } catch (\Exception $e) {
-                    return redirect()->back()->withErrors(['week_start' => 'La date de début de semaine n\'est pas valide.'])->withInput();
-                }
+            // Choisir la semaine correcte en fonction du jour actuel
+            if ($currentDayOfWeek >= Carbon::FRIDAY) {
+                // Vendredi, samedi, dimanche : afficher la semaine d'après
+                $startOfWeek = $today->copy()->addWeeks(2)->startOfWeek(Carbon::MONDAY);
+            } else {
+                // Lundi à jeudi : afficher la semaine prochaine
+                $startOfWeek = $today->copy()->addWeeks(1)->startOfWeek(Carbon::MONDAY);
             }
 
-            return view('FrontOffice.ajouter_menu', compact('currentFriday', 'currentDate', 'disabledDays'));
+            $weekStartFormatted = $startOfWeek->format('Y-m-d');
+            $week = Semaine::where('date_debut', $weekStartFormatted)->first();
+
+            $disabledDays = [];
+            if ($week) {
+                $jours = Jour::where('semaine_id', $week->id)->pluck('jour')->toArray();
+                $daysMap = [
+                    'lundi' => 'Lundi',
+                    'mardi' => 'Mardi',
+                    'mercredi' => 'Mercredi',
+                    'jeudi' => 'Jeudi',
+                    'vendredi' => 'Vendredi'
+                ];
+                $disabledDays = array_map(function($day) use ($daysMap) {
+                    return $daysMap[$day];
+                }, $jours);
+            }
+
+            return view('FrontOffice.ajouter_menu', compact('weekStartFormatted', 'disabledDays'));
         } else {
             return redirect()->route('admin.login');
         }
     }
 
+
     public function store(Request $request)
-{
-    $request->validate([
-        'week_start' => ['required', 'regex:/^\d{4}-W\d{2}$/'],
-        'active_days.*' => 'in:Lundi,Mardi,Mercredi,Jeudi,Vendredi',
-        'plat_title_Lundi' => 'nullable|string',
-        'plat_title_Mardi' => 'nullable|string',
-        'plat_title_Mercredi' => 'nullable|string',
-        'plat_title_Jeudi' => 'nullable|string',
-        'plat_title_Vendredi' => 'nullable|string',
-    ]);
-
-    $weekStart = $request->input('week_start');
-    $activeDays = $request->input('active_days', []);
-    $plats = $request->except(['week_start', 'active_days', '_token']);
-
-    try {
-        $weekStartDate = Carbon::parse($weekStart . '-1');
-        $weekStartFormatted = $weekStartDate->startOfWeek()->format('Y-m-d');
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['week_start' => 'La date de début de semaine n\'est pas valide.'])->withInput();
-    }
-
-    // Vérification des semaines existantes
-    $existingWeek = Semaine::where('date_debut', $weekStartFormatted)->first();
-    if ($existingWeek) {
-        return redirect()->back()->with('error', 'Cette semaine est déjà configurée')->withInput();
-    }
-
-    // Vérification des dates limites
-    $currentFriday = Carbon::now()->startOfWeek()->addDays(4)->format('Y-m-d');
-    $currentMonday = Carbon::now()->startOfWeek()->format('Y-m-d');
-
-    // Permettre la configuration pour les jours futurs à partir de lundi
-    if ($weekStartFormatted <= $currentFriday || $weekStartFormatted < $currentMonday) {
-        return redirect()->back()->with('error', 'La semaine sélectionnée doit être après le vendredi de la semaine en cours.')->withInput();
-    }
-
-    // Création de la semaine
-    $semaine = Semaine::create(['date_debut' => $weekStartFormatted]);
-
-    // Création des jours et plats
-    $jours = [
-        'Lundi' => 'lundi',
-        'Mardi' => 'mardi',
-        'Mercredi' => 'mercredi',
-        'Jeudi' => 'jeudi',
-        'Vendredi' => 'vendredi'
-    ];
-
-    foreach ($jours as $day => $jourKey) {
-        if (in_array($day, $activeDays)) {
-            $jour = Jour::create([
-                'semaine_id' => $semaine->id,
-                'jour' => $jourKey,
-            ]);
-
-            $platKey = "plat_title_$day";
-            if (isset($plats[$platKey])) {
-                Plat::create([
-                    'jour_id' => $jour->id,
-                    'titre' => $plats[$platKey],
+    {
+        $request->validate([
+            'week_start' => ['required', 'regex:/^\d{4}-W\d{2}$/'],
+            'active_days.*' => 'in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi,Dimanche',
+            'plat_title_Lundi' => 'nullable|string',
+            'plat_title_Mardi' => 'nullable|string',
+            'plat_title_Mercredi' => 'nullable|string',
+            'plat_title_Jeudi' => 'nullable|string',
+            'plat_title_Vendredi' => 'nullable|string',
+            'plat_title_Samedi' => 'nullable|string',
+            'plat_title_Dimanche' => 'nullable|string',
+        ]);
+    
+        $weekStart = $request->input('week_start');
+        $activeDays = $request->input('active_days', []);
+        $plats = $request->except(['week_start', 'active_days', '_token']);
+    
+        try {
+            $weekStartDate = Carbon::parse($weekStart . '-1');  // Parse as ISO week format
+            $weekStartFormatted = $weekStartDate->startOfWeek()->format('Y-m-d');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['week_start' => 'La date de début de semaine n\'est pas valide.'])->withInput();
+        }
+    
+        $today = Carbon::today();
+    
+        // Déterminer la semaine à configurer
+        if ($today->isFriday() || $today->isSaturday() || $today->isSunday()) {
+            // Afficher les jours pour la semaine d'après
+            $weekStartDate = $today->copy()->addWeeks(2)->startOfWeek();
+        } else {
+            // Afficher les jours pour la semaine prochaine
+            $weekStartDate = $today->copy()->addWeeks(1)->startOfWeek();
+        }
+    
+        $weekStartFormatted = $weekStartDate->format('Y-m-d');
+    
+        // Vérifier si la semaine est déjà configurée
+        $existingWeek = Semaine::where('date_debut', $weekStartFormatted)->first();
+        if ($existingWeek) {
+            return redirect()->back()->with('error', 'Cette semaine est déjà configurée')->withInput();
+        }
+    
+        // Création de la semaine et des jours
+        $semaine = Semaine::create(['date_debut' => $weekStartFormatted]);
+    
+        $jours = [
+            'Lundi' => 'lundi',
+            'Mardi' => 'mardi',
+            'Mercredi' => 'mercredi',
+            'Jeudi' => 'jeudi',
+            'Vendredi' => 'vendredi'
+        ];
+    
+        foreach ($jours as $day => $jourKey) {
+            if (in_array($day, $activeDays)) {
+                $jour = Jour::create([
+                    'semaine_id' => $semaine->id,
+                    'jour' => $jourKey,
                 ]);
+    
+                $platKey = "plat_title_$day";
+                if (isset($plats[$platKey])) {
+                    Plat::create([
+                        'jour_id' => $jour->id,
+                        'titre' => $plats[$platKey],
+                    ]);
+                }
             }
         }
+    
+        return redirect()->route('ajouter_menu')->with('success', 'Menus enregistrés avec succès !');
     }
+    
 
-    Log::info('Week Start Formatted: ' . $weekStartFormatted);
-    Log::info('Current Friday: ' . $currentFriday);
-    Log::info('Current Monday: ' . $currentMonday);
-
-    return redirect()->route('ajouter_menu')->with('success', 'Menus enregistrés avec succès !');
-}
 
 
 

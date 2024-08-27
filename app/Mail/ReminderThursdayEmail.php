@@ -28,7 +28,7 @@ class ReminderThursdayEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Dernier Rappel pour La Réservation de la Prochaine Semaine')
+        return $this->subject('Dernier Rappel pour La Réservation Des Repas De La Prochaine Semaine')
                     ->view('emails.reminder_thursday');
     }
 }

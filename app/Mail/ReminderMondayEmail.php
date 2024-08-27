@@ -28,7 +28,7 @@ class ReminderMondayEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('N’oubliez pas de Réserver pour la Semaine Prochaine')
+        return $this->subject('Premier Rappel Pour La Réservation Des Repas De La Semaine')
         ->view('emails.reminder_monday');
     }
 }

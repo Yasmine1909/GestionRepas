@@ -43,9 +43,12 @@
   <header id="header" class="fixed-top d-flex align-items-center topbar-scrolled" style="background-color: #0d4a75;">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-      <div class="logo me-auto">
-        <h1><a href="{{ url('/') }}" style="font-family:Satisfy;">M2M</a></h1>
-      </div>
+        <div class="logo me-auto">
+            <a href="{{ url('/') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="M2M Logo" style="height:100%;">
+            </a>
+        </div>
+
 
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
@@ -73,8 +76,8 @@
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container">
-      <h3>M2M</h3>
-      <p>Bienvenue sur M2M - Votre Solution de Réservation de Repas en Ligne</p>
+        <img src="{{ asset('images/logo.png') }}" alt="M2M Logo" style="height:100%;">
+        <p>Bienvenue sur M2M - Votre Solution de Réservation de Repas en Ligne</p>
       <div class="social-links">
         <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
         <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>

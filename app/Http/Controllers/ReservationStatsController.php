@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Models\Semaine;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 use Illuminate\Support\Facades\Auth;
 
 class ReservationStatsController extends Controller
@@ -55,9 +58,11 @@ class ReservationStatsController extends Controller
                     'name' => $user->name,
                     'last_name' => $user->last_name,
                     'email' => $user->email,
-                    'status' => 'Non Disponible'
+                    'status' => 'Non Disponible',
+                    'reason' => $user->reason // Assurez-vous que 'reason' est bien défini dans le modèle User
                 ];
             }),
+
             'noResponseList' => $noResponseUsers->map(function($user) {
                 return [
                     'name' => $user->name,
@@ -91,4 +96,37 @@ class ReservationStatsController extends Controller
 
         return response()->json($data);
     }
+    public function getWeeks(Request $request)
+{
+    $perPage = 5; // Nombre de semaines par page
+    $page = $request->input('page', 1); // Numéro de la page, par défaut 1
+    $weeks = Semaine::orderBy('date_debut', 'desc')->paginate($perPage, ['*'], 'page', $page);
+
+    return response()->json($weeks);
+}
+//ouahiba, yasmine
+
+public function downloadWeekPdf($weekId)
+{
+    // Récupère la semaine avec les jours, plats et réservations associés
+    $week = Semaine::with('jours.plats.reservations')->findOrFail($weekId);
+
+    // Préparer les données pour le PDF
+    $data = [
+        'week' => $week
+    ];
+
+    // Charge la vue PDF avec les données
+    $pdf = PDF::loadView('pdf.weekly-menu', $data);
+
+    return $pdf->download('menu-semaine-'.$week->date_debut.'.pdf');
+}
+
+
+
+
+
+
+
+
 }

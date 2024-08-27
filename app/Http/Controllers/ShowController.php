@@ -55,7 +55,7 @@ class ShowController extends Controller
         return view('FrontOffice.menus', compact('weeks', 'currentDate', 'activeWeeksStart'));
     } else {
         // Rediriger ou gérer les utilisateurs non connectés
-        return redirect()->route('login');
+        return redirect()->route('admin.login');
     }
 }
 
