@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Semaine;
@@ -54,12 +53,11 @@ class MenuController extends Controller
         }
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
             'week_start' => ['required', 'regex:/^\d{4}-W\d{2}$/'],
-            'active_days.*' => 'in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi,Dimanche',
+            'active_days.*' => 'in:Lundi,Mardi,Mercredi,Jeudi,Vendredi',
             'plat_title_Lundi' => 'nullable|string',
             'plat_title_Mardi' => 'nullable|string',
             'plat_title_Mercredi' => 'nullable|string',
@@ -68,40 +66,40 @@ class MenuController extends Controller
             'plat_title_Samedi' => 'nullable|string',
             'plat_title_Dimanche' => 'nullable|string',
         ]);
-    
+
         $weekStart = $request->input('week_start');
         $activeDays = $request->input('active_days', []);
         $plats = $request->except(['week_start', 'active_days', '_token']);
-    
+
         try {
             $weekStartDate = Carbon::parse($weekStart . '-1');  // Parse as ISO week format
             $weekStartFormatted = $weekStartDate->startOfWeek()->format('Y-m-d');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['week_start' => 'La date de début de semaine n\'est pas valide.'])->withInput();
         }
-    
+
         $today = Carbon::today();
-    
+
         // Déterminer la semaine à configurer
         if ($today->isFriday() || $today->isSaturday() || $today->isSunday()) {
-            // Afficher les jours pour la semaine d'après
+            // Afficher les jours pour la semaine après celle-ci
             $weekStartDate = $today->copy()->addWeeks(2)->startOfWeek();
         } else {
             // Afficher les jours pour la semaine prochaine
             $weekStartDate = $today->copy()->addWeeks(1)->startOfWeek();
         }
-    
+
         $weekStartFormatted = $weekStartDate->format('Y-m-d');
-    
+
         // Vérifier si la semaine est déjà configurée
         $existingWeek = Semaine::where('date_debut', $weekStartFormatted)->first();
         if ($existingWeek) {
             return redirect()->back()->with('error', 'Cette semaine est déjà configurée')->withInput();
         }
-    
+
         // Création de la semaine et des jours
         $semaine = Semaine::create(['date_debut' => $weekStartFormatted]);
-    
+
         $jours = [
             'Lundi' => 'lundi',
             'Mardi' => 'mardi',
@@ -109,14 +107,14 @@ class MenuController extends Controller
             'Jeudi' => 'jeudi',
             'Vendredi' => 'vendredi'
         ];
-    
+
         foreach ($jours as $day => $jourKey) {
             if (in_array($day, $activeDays)) {
                 $jour = Jour::create([
                     'semaine_id' => $semaine->id,
                     'jour' => $jourKey,
                 ]);
-    
+
                 $platKey = "plat_title_$day";
                 if (isset($plats[$platKey])) {
                     Plat::create([
@@ -126,62 +124,56 @@ class MenuController extends Controller
                 }
             }
         }
-    
+
         return redirect()->route('ajouter_menu')->with('success', 'Menus enregistrés avec succès !');
     }
-    
 
-
-
-
-
-
-
-
-
-
-    // Méthode pour afficher le formulaire de configuration hebdomadaire
     public function showWeeklyMenuForm()
-{
-    $configuration = ActiveDaysConfiguration::first();
-    $activeDays = $configuration ? $configuration->active_days : [];
+    {
+        $configuration = ActiveDaysConfiguration::first();
+        $activeDays = $configuration ? $configuration->active_days : [];
 
-    $daysMapping = [
-        'Lundi' => Carbon::MONDAY,
-        'Mardi' => Carbon::TUESDAY,
-        'Mercredi' => Carbon::WEDNESDAY,
-        'Jeudi' => Carbon::THURSDAY,
-        'Vendredi' => Carbon::FRIDAY,
-    ];
+        $daysMapping = [
+            'Lundi' => Carbon::MONDAY,
+            'Mardi' => Carbon::TUESDAY,
+            'Mercredi' => Carbon::WEDNESDAY,
+            'Jeudi' => Carbon::THURSDAY,
+            'Vendredi' => Carbon::FRIDAY,
+        ];
 
-    $today = Carbon::today();
+        $today = Carbon::today();
 
-    if (in_array($today->dayOfWeek, [Carbon::FRIDAY, Carbon::SATURDAY, Carbon::SUNDAY])) {
-        $nextMonday = $today->copy()->addWeeks(2)->startOfWeek(Carbon::MONDAY);
-    } else {
-        $nextMonday = $today->copy()->addWeeks(1)->startOfWeek(Carbon::MONDAY);
-    }
-
-    $dates = [];
-
-    foreach ($activeDays as $day) {
-        if (isset($daysMapping[$day])) {
-            $date = $nextMonday->copy()->addDays($daysMapping[$day] - Carbon::MONDAY)->startOfDay();
-            $dates[$day] = $date;
+        if (in_array($today->dayOfWeek, [Carbon::FRIDAY, Carbon::SATURDAY, Carbon::SUNDAY])) {
+            $nextMonday = $today->copy()->addWeeks(2)->startOfWeek(Carbon::MONDAY);
+        } else {
+            $nextMonday = $today->copy()->addWeeks(1)->startOfWeek(Carbon::MONDAY);
         }
+
+        $dates = [];
+
+        foreach ($activeDays as $day) {
+            if (isset($daysMapping[$day])) {
+                $date = $nextMonday->copy()->addDays($daysMapping[$day] - Carbon::MONDAY)->startOfDay();
+                $dates[$day] = $date;
+            }
+        }
+
+        return view('admin.ajouter_menu', compact('dates'));
     }
 
-    return view('admin.ajouter_menu', compact('dates'));
-}
-
-
-    // Méthode pour enregistrer le menu hebdomadaire
     public function storeWeeklyMenu(Request $request)
     {
         $menus = $request->input('menus');
 
         $today = Carbon::today();
-        $startOfNextWeek = $today->copy()->addWeeks(1)->startOfWeek();
+         // Déterminer la semaine à configurer
+         if ($today->isFriday() || $today->isSaturday() || $today->isSunday()) {
+            // Afficher les jours pour la semaine après celle-ci
+            $startOfNextWeek = $today->copy()->addWeeks(2)->startOfWeek();
+        } else {
+            // Afficher les jours pour la semaine prochaine
+            $startOfNextWeek = $today->copy()->addWeeks(1)->startOfWeek();
+        }
 
         $semaine = Semaine::where('date_debut', $startOfNextWeek->format('Y-m-d'))->first();
 
@@ -226,7 +218,6 @@ class MenuController extends Controller
         return redirect()->route('admin.show_weekly_menu_form')->with('success', 'Menus enregistrés avec succès !');
     }
 
-    // Méthode pour télécharger le PDF du menu
     public function downloadPDF(Request $request, $weekId)
     {
         $week = Semaine::with('jours.plats')->findOrFail($weekId);

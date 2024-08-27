@@ -17,7 +17,7 @@
 
         <!-- Card -->
         <div class="card shadow-sm border-light">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header  text-white" style="background-color: #0d4a75">
                 <h4 class="mb-0 text-white">Configuration des Jours Actifs</h4>
             </div>
             <div class="card-body">
