@@ -13,6 +13,7 @@
 </style>
 
 <div class="container" style="margin-top:15%;">
+    <h1 class="table-title text-center">Tableau de Bord des Menus</h1>
 
     <!-- Formulaire de Recherche -->
     <div class="search-bar">
@@ -21,8 +22,8 @@
             <button type="button" onclick="filterWeeks()" class="btn btn-primary mt-2">Rechercher</button>
         </form>
     </div>
+    <br>
 
-    <h1 class="table-title text-center">Tableau de Bord des Menus</h1>
     @foreach($weeks as $week)
     @php
         $weekStart = \Carbon\Carbon::parse($week->date_debut);

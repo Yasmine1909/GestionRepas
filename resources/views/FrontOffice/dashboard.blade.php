@@ -27,7 +27,8 @@
         overflow: hidden;
         border: none;
         margin-top: 30px;
-        max-width: 90%;
+        max-width: 80%;
+        max-height: 50%;
     margin: 0 auto;
     }
     h1 {
@@ -94,13 +95,15 @@
         transition: background-color 0.3s;
     }
     .btn-custom, .reserve-week-btn {
-        background-color:  #0056b3;
-        color: #ffffff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 50px;
-        transition: background-color 0.3s;
-        margin: 10px;
+        position: absolute;
+    bottom: 10px; /* Ajustez selon vos besoins */
+    right: 1140px;  /* Ajustez selon vos besoins */
+    background-color: #0056b3;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    transition: background-color 0.3s;
     }
     .reserve-week-btn:hover {
         background-color: #007bff;
@@ -223,8 +226,7 @@
 
 <div class="container" style="margin-top: 10%; margin-bottom: 5%; position: relative;">
 
-    <h1 class="text-center mb-4">Réservations de Repas</h1>
-    <button class="reserve-week-btn" id="reserveWeekBtn">Réserver Toute la Semaine</button>
+    <h1 class="text-center ">Réservations de Repas</h1>
 
 
     <div class="calendar">
@@ -343,6 +345,7 @@
 
 </div>
 
+<button class="reserve-week-btn" id="reserveWeekBtn"><i class="fas fa-list-check"></i></button>
 
 <div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

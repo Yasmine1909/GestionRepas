@@ -47,7 +47,7 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <div class="logo me-auto">
-        <img src="{{ asset('images/logo.png') }}" alt="M2M Logo" style="height:100%;">
+        <img src="{{ asset('images/Logo-M2M-Group.png') }}" alt="M2M Logo" >
     </div>
 
       <nav id="navbar" class="navbar order-last order-lg-0">
@@ -78,7 +78,7 @@
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container">
-        <img src="{{ asset('images/logo.png') }}" alt="M2M Logo" style="height:100%;">
+        <img src="{{ asset('images/Logo-M2M-Group.png') }}" alt="M2M Logo" style="height: 25%;width:25%;">
         <p>Bienvenue sur M2M - Votre Solution de Réservation de Repas en Ligne</p>
       <div class="social-links">
         <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
