@@ -240,6 +240,7 @@
 <div class="header ">Dim</div>
 <div class="header">Télécharger</div>
 
+
 <!-- Generate calendar days -->
 @foreach ($calendarDays->chunk(8) as $week)
     @foreach ($week as $day)
@@ -344,6 +345,7 @@
     </div>
 
 </div>
+
 
 <button class="reserve-week-btn" id="reserveWeekBtn"><i class="fas fa-list-check"></i></button>
 <div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">

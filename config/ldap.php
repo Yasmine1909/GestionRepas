@@ -44,7 +44,12 @@ return [
         ],
 
     ],
-
+'accounts' => [
+        'provider' => [
+            'model' => App\Models\LdapUser::class,
+            'connection' => 'default',
+        ],
+    ],
     /*
     |--------------------------------------------------------------------------
     | LDAP Logging

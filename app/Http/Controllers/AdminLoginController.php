@@ -6,8 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 
+use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+
+
 class AdminLoginController extends Controller
 {
+    use AuthenticatesUsers;
+    protected $redirectTo = 'menus';
+
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
@@ -19,30 +26,25 @@ class AdminLoginController extends Controller
         return view('auth.admin-login');
     }
 
-    // Gère la connexion admin
-    public function login(Request $request)
-    {
-        $this->validate($request, [
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ]);
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            // Rediriger vers le tableau de bord admin
-            return redirect()->route('menus');
-        }
 
-        return back()->withInput($request->only('email', 'remember'))
-                     ->withErrors(['email' => 'Ces identifiants ne correspondent pas à nos enregistrements.']);
-    }
-
-    // Gère la déconnexion admin
     public function logout(Request $request)
     {
-        Auth::logout();
-        return redirect()->route('admin.login');
-    }
+        $this->guard()->logout();
 
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login');    }
+    protected function credentials(Request $request)
+    {
+        return[
+            'mail'=>$request->get('email'),
+            'password'=>$request->get('password'),
+
+        ];
+    }
 
 
 }

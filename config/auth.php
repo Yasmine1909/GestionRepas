@@ -36,16 +36,19 @@ return [
     */
 
     'guards' => [
+        // 'web' => [
+        //     'driver' => 'session',
+        //     'provider' => 'ldap',
+        // ],
+
         'web' => [
             'driver' => 'session',
             'provider' => 'ldap',
         ],
-        // 'api'=>[
-        //     'driver'=>'token',
-        //     'provider'=>'users',
-        //     'hash'=>false,
-        // ],
-
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'ldap',
+        ],
     ],
 
     /*
@@ -70,14 +73,14 @@ return [
         //     'driver' => 'eloquent',
         //     'model' => App\Models\User::class,
         // ],
-        
+
         'ldap'=>[
             'driver'=>'ldap',
             'model'=>LdapRecord\Models\ActiveDirectory\User::class,
 
         ],
 
-   
+
 
 
     ],

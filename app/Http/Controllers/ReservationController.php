@@ -1,4 +1,6 @@
 <?php
+
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -14,67 +16,62 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationMail;
+
 class ReservationController extends Controller
 {
+    // Assurez-vous que le middleware 'auth' est appliqué pour toutes les méthodes
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
-{
-    if (Auth::check()) {
-    $this->middleware('auth');
-    $now = Carbon::now();
-    $currentDayOfWeek = $now->dayOfWeek;
+    {
+        // Si l'utilisateur est connecté
+        if (Auth::check()) {
+            $now = Carbon::now();
+            $currentDayOfWeek = $now->dayOfWeek;
 
-    if ($currentDayOfWeek === Carbon::FRIDAY) {
-        // Si aujourd'hui est vendredi, la semaine réservable commence dans deux semaines
-        $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
-        $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
-    } elseif ($currentDayOfWeek === Carbon::SATURDAY) {
-        // Si aujourd'hui est samedi, la semaine réservable commence dans deux semaines
-        $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
-        $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
-    } elseif ($currentDayOfWeek === Carbon::SUNDAY) {
-        // Si aujourd'hui est dimanche, la semaine réservable commence dans deux semaines
-        $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
-        $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
-    } else {
-        // Pour tous les autres jours (lundi à jeudi), la semaine réservable commence la semaine prochaine
-        $startOfReservableWeek = $now->copy()->addWeek()->startOfWeek();
-        $endOfReservableWeek = $now->copy()->addWeek()->endOfWeek();
+            if ($currentDayOfWeek === Carbon::FRIDAY || $currentDayOfWeek === Carbon::SATURDAY || $currentDayOfWeek === Carbon::SUNDAY) {
+                $startOfReservableWeek = $now->copy()->addWeeks(2)->startOfWeek();
+                $endOfReservableWeek = $now->copy()->addWeeks(2)->endOfWeek();
+            } else {
+                $startOfReservableWeek = $now->copy()->addWeek()->startOfWeek();
+                $endOfReservableWeek = $now->copy()->addWeek()->endOfWeek();
+            }
+
+            $startOfDisplayWeek = $startOfReservableWeek->copy()->subWeeks(2);
+            $endOfDisplayWeek = $endOfReservableWeek->copy()->addWeeks(1);
+
+            $userId = Auth::id();
+            $reservations = Reservation::where('user_id', $userId)->get();
+            $reservations = Reservation::all();
+            $jours = Jour::whereBetween('date', [$startOfDisplayWeek, $endOfDisplayWeek])
+                ->with('plats')
+                ->get()
+                ->keyBy(function($item) {
+                    return Carbon::parse($item->date)->format('Y-m-d');
+                });
+
+            $calendarDays = collect();
+            $currentDay = $startOfDisplayWeek->copy();
+            while ($currentDay->lte($endOfDisplayWeek)) {
+                $calendarDays->push($currentDay->copy());
+                $currentDay->addDay();
+            }
+
+            return view('FrontOffice.dashboard', [
+                'calendarDays' => $calendarDays,
+                'jours' => $jours,
+                'currentWeekStart' => $startOfReservableWeek,
+                'reservations' => $reservations,
+                'currentWeekEnd' => $endOfReservableWeek
+            ]);
+        } else {
+            // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
+            return redirect()->route('connexion');
+        }
     }
-
-    // Définir les semaines précédentes et suivantes à afficher
-    $startOfDisplayWeek = $startOfReservableWeek->copy()->subWeeks(2);
-    $endOfDisplayWeek = $endOfReservableWeek->copy()->addWeeks(1);
-
-    $user = auth()->user();
-    $reservations = Reservation::where('user_id', $user->id)->get();
-
-    $jours = Jour::whereBetween('date', [$startOfDisplayWeek, $endOfDisplayWeek])
-        ->with('plats')
-        ->get()
-        ->keyBy(function($item) {
-            return Carbon::parse($item->date)->format('Y-m-d');
-        });
-
-    $calendarDays = collect();
-    $currentDay = $startOfDisplayWeek->copy();
-    while ($currentDay->lte($endOfDisplayWeek)) {
-        $calendarDays->push($currentDay->copy());
-        $currentDay->addDay();
-    }
-
-    return view('FrontOffice.dashboard', [
-        'calendarDays' => $calendarDays,
-        'jours' => $jours,
-        'currentWeekStart' => $startOfReservableWeek,
-        'reservations' => $reservations,
-        'currentWeekEnd' => $endOfReservableWeek
-    ]);
-} else {
-    // Rediriger ou gérer les utilisateurs non connectés
-    return redirect()->route('connexion');
-}
-}
-
 
     public function downloadMenu($startDate)
     {
@@ -90,6 +87,7 @@ class ReservationController extends Controller
     public function reserve(Request $request)
     {
         $userId = Auth::id();
+
         $date = Carbon::parse($request->input('date'));
 
         $plat = Plat::whereHas('jour', function ($query) use ($date) {
@@ -116,33 +114,6 @@ class ReservationController extends Controller
         return response()->json(['success' => false, 'message' => 'Plat non trouvé'], 400);
     }
 
-
-
-
-
-// public function validateReservation(Request $request)
-// {
-//     $data = $request->validate([
-//         'date' => 'required|date',
-//         'status' => 'required|string',
-//         'reason' => 'nullable|string',
-//     ]);
-
-//     // Convertir la date en Carbon
-//     $date = Carbon::parse($data['date']);
-//     $jour = Jour::where('date', $date->format('Y-m-d'))->first();
-
-//     if ($jour) {
-//         $jour->status = $data['status'];
-//         $jour->reason = $data['reason'] ?? null;
-//         $jour->save();
-
-//         return response()->json(['success' => true]);
-//     }
-
-//     return response()->json(['success' => false]);
-// }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -151,16 +122,14 @@ class ReservationController extends Controller
             'reason' => 'nullable|string'
         ]);
 
-        $user = auth()->user();
+        $userId = Auth::id();
         $reservation = Reservation::updateOrCreate(
-            ['date' => $request->date, 'user_id' => $user->id],
+            ['date' => $request->date, 'user_id' => $userId],
             ['status' => $request->status, 'reason' => $request->reason]
         );
 
         return response()->json(['message' => 'Réservation enregistrée avec succès', 'success' => true], 200);
     }
-
-
 
     public function cancel(Request $request)
     {
@@ -168,8 +137,8 @@ class ReservationController extends Controller
             'date' => 'required|date'
         ]);
 
-        $user = auth()->user();
-        $reservation = Reservation::where('user_id', $user->id)
+        $userId = Auth::id();
+        $reservation = Reservation::where('user_id', $userId)
             ->where('date', $request->date)
             ->first();
 
@@ -199,14 +168,11 @@ class ReservationController extends Controller
         return response()->json(['message' => 'Réservation non trouvée'], 400);
     }
 
-
-
-
-
     public function reserveWeek(Request $request)
     {
         $days = $request->input('days');
-        $userId = auth()->id();
+        $userId = Auth::id();
+
         $reservedDates = Reservation::where('user_id', $userId)->pluck('date')->toArray();
 
         foreach ($days as $day) {
@@ -236,6 +202,4 @@ class ReservationController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-
 }

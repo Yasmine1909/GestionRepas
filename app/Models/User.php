@@ -13,36 +13,44 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Le nom de la clé primaire.
      *
-     * @var array<int, string>
+     * @var string
      */
+    protected $primaryKey = 'id';
+
+    /**
+     * Les types de cast des attributs.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'string', // Assurez-vous que l'ID est traité comme une chaîne
+        'email_verified_at' => 'datetime',
+    ];
+
+    /**
+     * Indique si les IDs sont auto-incrémentés.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
     protected $fillable = [
+        'id',
         'name',
         'last_name',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
     }
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
 }

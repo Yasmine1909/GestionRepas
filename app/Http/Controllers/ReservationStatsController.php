@@ -45,7 +45,7 @@ class ReservationStatsController extends Controller
             'confirmedList' => User::whereIn('id', $confirmedReservations)->get()->map(function($user) {
                 return [
                     'name' => $user->name,
-                    'last_name' => $user->last_name,
+
                     'email' => $user->email,
                     'status' => 'Confirmé'
                 ];
@@ -53,7 +53,7 @@ class ReservationStatsController extends Controller
             'notAvailableList' => User::whereIn('id', $notAvailableUsers)->get()->map(function($user) {
                 return [
                     'name' => $user->name,
-                    'last_name' => $user->last_name,
+
                     'email' => $user->email,
                     'status' => 'Non Disponible',
                     'reason' => $user->reason // Assurez-vous que 'reason' est bien défini dans le modèle User
@@ -62,7 +62,7 @@ class ReservationStatsController extends Controller
             'noResponseList' => $noResponseUsers->map(function($user) {
                 return [
                     'name' => $user->name,
-                    'last_name' => $user->last_name,
+
                     'email' => $user->email,
                     'status' => 'Pas Encore Répondu'
                 ];

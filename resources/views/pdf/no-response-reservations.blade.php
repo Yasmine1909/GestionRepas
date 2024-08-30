@@ -28,8 +28,7 @@
     <table>
         <thead>
             <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
+                <th>Nom Complet</th>
                 <th>Email</th>
             </tr>
         </thead>
@@ -37,7 +36,6 @@
             @foreach ($reservations as $user)
                 <tr>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->last_name }}</td>
                     <td>{{ $user->email }}</td>
                 </tr>
             @endforeach
