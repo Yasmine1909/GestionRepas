@@ -30,7 +30,6 @@
 <div class="container" style="margin-top: 50px;">
     <h1 class="text-center mb-4">Statistiques des Réservations</h1>
 
-    <!-- Section pour la sélection de la date -->
     <div class="row mb-4">
         <div class="col-md-6 offset-md-3">
             <input type="date" class="form-control" id="selectedDate" placeholder="Sélectionnez une date">
@@ -40,7 +39,7 @@
         </div>
     </div>
 
-    <!-- Statistiques globales -->
+
     <div class="row">
         <div class="col-md-4">
             <div class="stat-card">
@@ -65,26 +64,21 @@
         </div>
     </div>
 
-    <!-- Listes détaillées avec boutons de téléchargement -->
     <div class="row mt-4">
         <div class="col-md-4">
             <ul class="list-group" id="confirmedList" style="display: none;">
-                <!-- Liste dynamique -->
             </ul>
         </div>
         <div class="col-md-4">
             <ul class="list-group" id="notAvailableList" style="display: none;">
-                <!-- Liste dynamique -->
             </ul>
         </div>
         <div class="col-md-4">
             <ul class="list-group" id="noResponseList" style="display: none;">
-                <!-- Liste dynamique -->
             </ul>
         </div>
     </div>
 
-    <!-- Tableau des semaines avec bouton de téléchargement PDF -->
     <div class="row mt-4">
         <div class="col-md-12">
             <h2 class="text-center mb-4">Historique des Semaines</h2>
@@ -96,12 +90,10 @@
                     </tr>
                 </thead>
                 <tbody id="weeksTableBody">
-                    <!-- Les lignes de tableau seront ajoutées dynamiquement ici -->
                 </tbody>
             </table>
             <nav>
                 <ul class="pagination" id="pagination" style="justify-content: center;">
-                    <!-- Pagination sera ajoutée dynamiquement ici -->
                 </ul>
             </nav>
         </div>
@@ -109,11 +101,8 @@
 
 </div>
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
@@ -182,15 +171,12 @@ $('#downloadNoResponseList').click(function() {
         const margins = { top: 20, left: 15, bottom: 15 };
         const lineHeight = 10;
 
-        // Date actuelle
         const currentDate = new Date().toLocaleDateString();
 
-        // Titre du document
         doc.setFontSize(16);
         doc.setFont("helvetica", "bold");
         doc.text(title, margins.left, margins.top);
 
-        // Information de la date sélectionnée et la date de téléchargement
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         doc.text(`Nombre de Personnes Dans cette Liste: ${items.length}`, margins.left, margins.top + 10);
@@ -204,13 +190,11 @@ $('#downloadNoResponseList').click(function() {
             const item = items[i];
             const email = item.getAttribute('data-email');
             const name = item.textContent.trim().split(/\s+/);
-            const status = item.querySelector('.badge').textContent.trim(); // Trim pour éviter les erreurs d'espace
-            const reason = item.getAttribute('data-reason'); // Récupération de la raison
+            const status = item.querySelector('.badge').textContent.trim();
+            const reason = item.getAttribute('data-reason');
 
-            // Affichage des données : Nom, Prénom, Email
             doc.text(`${name[0]} ${name[1]} - ${email}`, margins.left, y);
 
-            // Si le statut est 'Non Disponible', ajouter la raison
             if (status === 'Non Disponible' && reason) {
                 y += lineHeight;
                 doc.text(`Raison: ${reason}`, margins.left, y);
@@ -218,7 +202,6 @@ $('#downloadNoResponseList').click(function() {
 
             y += lineHeight;
 
-            // Si la page est pleine, ajouter une nouvelle page
             if (y > doc.internal.pageSize.height - margins.bottom) {
                 doc.addPage();
                 y = margins.top;
@@ -241,7 +224,6 @@ function loadWeeks(page = 1) {
             tableBody.empty();
             pagination.empty();
 
-            // Ajouter les semaines au tableau
             response.data.forEach(week => {
                 tableBody.append(`
                     <tr>
@@ -251,9 +233,7 @@ function loadWeeks(page = 1) {
                 `);
             });
 
-            // Ajouter la pagination
             if (response.last_page > 1) {
-                // Page précédente
                 if (response.current_page > 1) {
                     pagination.append(`
                         <li class="page-item">
@@ -262,7 +242,6 @@ function loadWeeks(page = 1) {
                     `);
                 }
 
-                // Pages numérotées
                 for (let i = 1; i <= response.last_page; i++) {
                     const activeClass = i === response.current_page ? 'active' : '';
                     pagination.append(`
@@ -272,7 +251,6 @@ function loadWeeks(page = 1) {
                     `);
                 }
 
-                // Page suivante
                 if (response.current_page < response.last_page) {
                     pagination.append(`
                         <li class="page-item">
@@ -287,7 +265,6 @@ function loadWeeks(page = 1) {
 
 
     loadWeeks();
-    // Gestion des clics sur les boutons de pagination
     $(document).on('click', '.page-link', function(e) {
         e.preventDefault();
         const page = $(this).data('page');

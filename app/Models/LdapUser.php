@@ -12,8 +12,8 @@ class LdapUser extends Model implements AuthenticatableContract
 {
     use Authenticatable;
 
-    protected $guidKey = 'objectguid'; // Utiliser l'attribut LDAP approprié
+    protected $guidKey = 'objectguid'; 
 
 
-    
+
 }

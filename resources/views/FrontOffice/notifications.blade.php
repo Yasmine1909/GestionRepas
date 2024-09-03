@@ -109,7 +109,7 @@
 
         <h1 class="table-title text-center">Notifications</h1>
 
-        <!-- Notifications -->
+
         @foreach($notifications as $notification)
             <div class="notification notification-{{ $notification->type }}">
                 <p>{{ $notification->message }}</p>
@@ -117,7 +117,7 @@
             </div>
         @endforeach
 
-        <!-- Pagination Links -->
+
         <nav aria-label="Page navigation">
             @include('vendor.pagination.simple-custom', ['paginator' => $notifications])
         </nav>

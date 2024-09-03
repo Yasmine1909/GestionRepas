@@ -6,7 +6,6 @@
 
 
 <div class="container-xxl bg-white p-0 mt-3" style="margin-top:15%;">
-    <!-- Menu Start -->
     <div class="container-xxl py-5" style="margin-top:8%;">
         <div class="container">
             <div class="text-center wow fadeInUp" data-wow-delay="0.1s">

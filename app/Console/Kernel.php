@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function () {
-            $users = User::all(); // Assurez-vous que votre modèle User est bien configuré
+            $users = User::all();
             foreach ($users as $user) {
                 Mail::to($user->email)->send(new ReminderMondayEmail());
             }
@@ -31,6 +31,9 @@ class Kernel extends ConsoleKernel
                 Mail::to($user->email)->send(new ReminderThursdayEmail());
             }
         })->thursdays()->at('10:00');
+
+
+        $schedule->command('ldap:sync-users')->dailyAt('16:47');
     }
 
     /**

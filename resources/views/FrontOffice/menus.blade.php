@@ -14,7 +14,6 @@
 
 <div class="container" style="margin-top:15%;">
     <h1 class="table-title text-center">Tableau de Bord des Menus</h1>
-    <!-- Formulaire de Recherche -->
     <div class="search-bar">
         <form id="searchForm" class="form-inline">
             <input type="date" id="searchDate" class="form-control mr-2" placeholder="Rechercher par date">
@@ -25,7 +24,7 @@
     @foreach($weeks as $week)
     @php
         $weekStart = \Carbon\Carbon::parse($week->date_debut);
-        $isConsultationOnly = $weekStart->lt($activeWeeksStart); // Consultation uniquement si la semaine commence avant la semaine active
+        $isConsultationOnly = $weekStart->lt($activeWeeksStart);
     @endphp
 
     <div class="week-container" data-week-start="{{ $weekStart->format('Y-m-d') }}">
@@ -90,15 +89,13 @@
     </div>
     @endforeach
 
-    <!-- Pagination Controls -->
-    <!-- In your Blade view (menus.blade.php) -->
+
 <div class="pagination" style="justify-content: center;">
     {{ $weeks->links('vendor.pagination.customm') }}
 </div>
 
 </div>
 
-<!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

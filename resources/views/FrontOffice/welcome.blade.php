@@ -6,7 +6,7 @@
 
 
 
-  <!-- ======= Hero Section ======= -->
+
   <section id="hero">
     <div class="hero-container">
         <div id="heroCarousel" data-bs-interval="5000" class="carousel slide carousel-fade" data-bs-ride="carousel">
@@ -30,11 +30,11 @@
           </div>
 
     </div>
-  </section><!-- End Hero -->
+  </section>
 
   <main id="main">
 
-    <!-- ======= About Section ======= -->
+
     <section id="about" class="about">
       <div class="container-fluid">
 
@@ -64,14 +64,13 @@
         </div>
 
       </div>
-    </section><!-- End About Section -->
+    </section>
 
 
 
 
 
-
-  </main><!-- End #main -->
+  </main>
 
 
 

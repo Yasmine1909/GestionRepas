@@ -9,7 +9,7 @@ class Jour extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['semaine_id', 'date', 'jour']; // Assurez-vous que 'date' est inclus
+    protected $fillable = ['semaine_id', 'date', 'jour'];
     protected $dates = ['date'];
     public function semaine()
     {

@@ -19,7 +19,6 @@ class CreatePlatsTable extends Migration
             $table->string('titre');
             $table->timestamps();
 
-            // Define foreign key constraint
             $table->foreign('jour_id')->references('id')->on('jours')->onDelete('cascade');
         });
     }

@@ -4,10 +4,10 @@
 <br><br<<br><br><br><br>
 <main id="main" class="py-5">
 
-    <!-- Container -->
+
     <div class="container">
 
-        <!-- Success Alert -->
+
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -15,7 +15,7 @@
             </div>
         @endif
 
-        <!-- Card -->
+
         <div class="card shadow-sm border-light">
             <div class="card-header  text-white" style="background-color: #0d4a75">
                 <h4 class="mb-0 text-white">Configuration des Jours Actifs</h4>

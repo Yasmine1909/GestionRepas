@@ -16,7 +16,7 @@ class CreateReservationsTable extends Migration
 
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->uuid('user_id'); // Utiliser UUID pour les clés étrangères
+            $table->uuid('user_id'); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('plat_id')->constrained()->onDelete('cascade');
             $table->date('date');

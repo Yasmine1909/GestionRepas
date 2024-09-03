@@ -25,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'id' => 'string', // Assurez-vous que l'ID est traité comme une chaîne
+        'id' => 'string', 
         'email_verified_at' => 'datetime',
     ];
 

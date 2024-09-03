@@ -230,7 +230,6 @@
 
 
     <div class="calendar">
-        <!-- Headers for days of the week and download buttons -->
 <div class="header">Lun</div>
 <div class="header">Mar</div>
 <div class="header">Mer</div>
@@ -241,7 +240,6 @@
 <div class="header">Télécharger</div>
 
 
-<!-- Generate calendar days -->
 @foreach ($calendarDays->chunk(8) as $week)
     @foreach ($week as $day)
         @php
@@ -272,7 +270,7 @@
                 $dayClass .= 'disabled';
             }
 
-            // Déterminer l'icône à afficher
+
             $icon = '';
             if ($isReserved) {
                 if ($reservation->status === 'available') {
@@ -304,7 +302,7 @@
             @if ($plats)
                 <div class="plat-info">{{ $plats }}</div>
             @endif
-            <!-- Afficher l'icône -->
+
             {!! $icon !!}
         </div>
 
@@ -396,8 +394,8 @@
       $('.clickable').on('click', function() {
           var date = $(this).data('date');
           var plats = $(this).data('plats');
-          var status = $(this).data('status'); // Assurez-vous que ces données sont passées
-          var reason = $(this).data('reason'); // Assurez-vous que ces données sont passées
+          var status = $(this).data('status');
+          var reason = $(this).data('reason');
           var isReserved = $(this).hasClass('reserved');
 
           $('#menuDate').text(date);
@@ -410,7 +408,7 @@
 
               if (status === 'unavailable') {
                   $('#nonAvailabilityReason').show();
-                  $('#reasonSelect').val(reason); // Prend la valeur de la raison de non-disponibilité
+                  $('#reasonSelect').val(reason);
                   $('#modalMessage').text('Vous avez confirmé votre non disponibilité pour raison: ' + reason);
               } else {
                   $('#nonAvailabilityReason').hide();
@@ -430,7 +428,7 @@
           $('#menuModal').modal('show');
       });
 
-      // Option pour la raison de non-disponibilité
+
       $('input[name="status"]').change(function() {
           if ($(this).val() === 'unavailable') {
               $('#nonAvailabilityReason').show();
@@ -439,7 +437,7 @@
           }
       });
 
-      // Gestion des boutons de réservation et d'annulation
+
       $('#reserveBtn').on('click', function() {
           var date = $('#menuDate').text();
           var status = $('input[name="status"]:checked').val();
@@ -460,7 +458,7 @@
                       $('#modalMessage').text(status === 'available' ? 'Vous avez confirmé votre disponibilité' : 'Vous avez confirmé votre non disponibilité pour raison: ' + reason);
                       setTimeout(function() {
                         location.reload();
-                    }, 1000); // Délai de 1 seconde avant le rechargement
+                    }, 1000);
                   }
                   $('#menuModal').modal('hide');
               },
@@ -488,7 +486,7 @@
               success: function(response) {
                   $('.calendar .clickable[data-date="' + date + '"]').removeClass('reserved');
                   $('#modalMessage').text('Votre réservation a été annulée.');
-                    // Recharger la page après une annulation réussie
+
                     setTimeout(function() {
                         location.reload();
                     }, 1000);
@@ -506,7 +504,7 @@
     $('.calendar .clickable.reservable-week').each(function() {
         var date = $(this).data('date');
         var plats = $(this).data('plats');
-        if (plats) { // Vérifie qu'il y a bien un plat pour ce jour
+        if (plats) {
             reservableDays.push({
                 date: date,
                 plats: plats
@@ -516,7 +514,7 @@
 
     if (reservableDays.length > 0) {
         $.ajax({
-            url: '{{ route('reserve.week') }}', // Créez cette route pour gérer la réservation de toute la semaine
+            url: '{{ route('reserve.week') }}',
             type: 'POST',
             data: {
                 days: reservableDays,
@@ -524,7 +522,7 @@
             },
             success: function(response) {
                 if (response.success) {
-                    // Mettez à jour le calendrier pour afficher les jours réservés
+
                     reservableDays.forEach(function(day) {
                         $('.calendar .clickable[data-date="' + day.date + '"]').addClass('reserved');
                     });
@@ -553,8 +551,7 @@
 
 function handleReservation(response) {
     if (response.success) {
-        alert(response.message); // Affiche 'Réservation Réussie'
-        // Vous pouvez aussi afficher ce message dans un élément spécifique de votre page
+        alert(response.message);
         document.getElementById('message').innerHTML = `<div class="alert alert-success">${response.message}</div>`;
     } else {
         alert('Erreur : ' + response.message);
@@ -563,14 +560,13 @@ function handleReservation(response) {
 
 function handleCancellation(response) {
     if (response.success) {
-        alert(response.message); // Affiche 'Annulation Réussie'
+        alert(response.message);
         document.getElementById('message').innerHTML = `<div class="alert alert-success">${response.message}</div>`;
     } else {
         alert('Erreur : ' + response.message);
     }
 }
 
-// Exemple de fonction pour effectuer une réservation
 function reserveDate(date) {
     fetch('/reserve', {
         method: 'POST',
@@ -585,7 +581,6 @@ function reserveDate(date) {
     .catch(error => console.error('Erreur:', error));
 }
 
-// Exemple de fonction pour annuler une réservation
 function cancelReservation(date) {
     fetch('/cancel', {
         method: 'POST',
