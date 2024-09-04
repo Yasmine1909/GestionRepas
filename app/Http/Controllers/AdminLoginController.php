@@ -20,7 +20,6 @@ class AdminLoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    // Affiche le formulaire de connexion admin
     public function showLoginForm()
     {
         return view('auth.admin-login');

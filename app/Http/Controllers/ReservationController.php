@@ -19,7 +19,6 @@ use App\Mail\NotificationMail;
 
 class ReservationController extends Controller
 {
-    // Assurez-vous que le middleware 'auth' est appliqué pour toutes les méthodes
     public function __construct()
     {
         $this->middleware('auth');
@@ -27,7 +26,6 @@ class ReservationController extends Controller
 
     public function index()
     {
-        // Si l'utilisateur est connecté
         if (Auth::check()) {
             $now = Carbon::now();
             $currentDayOfWeek = $now->dayOfWeek;
@@ -68,7 +66,6 @@ class ReservationController extends Controller
                 'currentWeekEnd' => $endOfReservableWeek
             ]);
         } else {
-            // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
             return redirect()->route('connexion');
         }
     }
@@ -101,7 +98,6 @@ class ReservationController extends Controller
                     ['plat_id' => $plat->id, 'status' => $request->input('status'), 'reason' => $request->input('reason')]
                 );
 
-                // Créer une notification pour la réservation
                 app(NotificationController::class)->storeReservationNotification($reservation->id);
 
                 return response()->json(['success' => true]);
@@ -147,14 +143,12 @@ class ReservationController extends Controller
                 $reservation->delete();
                 $date = Carbon::parse($reservation->date);
 
-                // Création de la notification
                 $notification = Notification::create([
                     'user_id' => $reservation->user_id,
                     'type' => 'danger',
                     'message' => 'Votre réservation pour le ' . $date->format('d-m-Y') . ' a été annulée.'
                 ]);
 
-                // Envoi de l'email d'annulation
                 Mail::to($reservation->user->email)->send(new NotificationMail($notification));
 
                 Log::info('Réservation annulée et email envoyé avec succès à ' . $reservation->user->email);
@@ -178,24 +172,20 @@ class ReservationController extends Controller
         foreach ($days as $day) {
             $date = Carbon::parse($day['date'])->format('Y-m-d');
 
-            // Vérifier si la date est déjà réservée
             if (in_array($date, $reservedDates)) {
-                continue; // Passer à la date suivante si elle est déjà réservée
+                continue;
             }
 
-            // Trouver le plat correspondant au jour donné
             $plat = Plat::whereHas('jour', function ($query) use ($date) {
                 $query->where('date', $date);
             })->first();
 
             if ($plat) {
-                // Créer ou mettre à jour la réservation pour ce jour avec le plat associé
                 $reservation = Reservation::updateOrCreate(
                     ['user_id' => $userId, 'date' => $date],
                     ['status' => 'available', 'plat_id' => $plat->id]
                 );
 
-                // Créer une notification pour la réservation
                 app(NotificationController::class)->storeReservationNotification($reservation->id);
             }
         }

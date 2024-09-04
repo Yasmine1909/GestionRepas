@@ -24,11 +24,10 @@ class NotificationController extends Controller
         $userId = Auth::id();
         $notifications = Notification::where('user_id', $userId)
                                     ->orderBy('created_at', 'desc')
-                                    ->paginate(20);  // Pagination avec 30 notifications par page
+                                    ->paginate(20);
 
         return view('FrontOffice.notifications', compact('notifications'));
     } else {
-        // Rediriger ou gérer les utilisateurs non connectés
         return redirect()->route('login');
     }
     }
@@ -63,7 +62,6 @@ class NotificationController extends Controller
             'message' => $message
         ]);
 
-        // Envoi de l'email
         Mail::to($reservation->user->email)->send(new NotificationMail($notification));
     }
 
@@ -89,7 +87,6 @@ class NotificationController extends Controller
 
             Log::info('Notification d\'annulation créée avec succès : ' . $notification->id);
 
-            // Envoi de l'email
             Mail::to($reservation->user->email)->send(new NotificationMail($notification));
 
             Log::info('Email d\'annulation envoyé avec succès à : ' . $reservation->user->email);
@@ -99,15 +96,13 @@ class NotificationController extends Controller
     }
     public function search(Request $request)
 {
-    // Vérifier que l'utilisateur est connecté
     if (!Auth::check()) {
         return redirect()->route('login');
     }
 
-    $userId = Auth::id(); // Obtenir l'ID de l'utilisateur connecté
+    $userId = Auth::id();
     $query = $request->input('query');
 
-    // Filtrer les notifications de l'utilisateur connecté et par recherche
     $notifications = Notification::where('user_id', $userId)
                                   ->where(function($q) use ($query) {
                                       $q->where('message', 'LIKE', "%$query%")

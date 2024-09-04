@@ -16,16 +16,12 @@ class MenuController extends Controller
     public function ajouter_menu()
     {
         if (Auth::check()) {
-            // Déterminer la date actuelle et la semaine à afficher
             $today = Carbon::today();
             $currentDayOfWeek = $today->dayOfWeek;
 
-            // Choisir la semaine correcte en fonction du jour actuel
             if ($currentDayOfWeek >= Carbon::FRIDAY) {
-                // Vendredi, samedi, dimanche : afficher la semaine d'après
                 $startOfWeek = $today->copy()->addWeeks(2)->startOfWeek(Carbon::MONDAY);
             } else {
-                // Lundi à jeudi : afficher la semaine prochaine
                 $startOfWeek = $today->copy()->addWeeks(1)->startOfWeek(Carbon::MONDAY);
             }
 
@@ -72,7 +68,7 @@ class MenuController extends Controller
         $plats = $request->except(['week_start', 'active_days', '_token']);
 
         try {
-            $weekStartDate = Carbon::parse($weekStart . '-1');  // Parse as ISO week format
+            $weekStartDate = Carbon::parse($weekStart . '-1');
             $weekStartFormatted = $weekStartDate->startOfWeek()->format('Y-m-d');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['week_start' => 'La date de début de semaine n\'est pas valide.'])->withInput();
@@ -80,24 +76,19 @@ class MenuController extends Controller
 
         $today = Carbon::today();
 
-        // Déterminer la semaine à configurer
         if ($today->isFriday() || $today->isSaturday() || $today->isSunday()) {
-            // Afficher les jours pour la semaine après celle-ci
             $weekStartDate = $today->copy()->addWeeks(2)->startOfWeek();
         } else {
-            // Afficher les jours pour la semaine prochaine
             $weekStartDate = $today->copy()->addWeeks(1)->startOfWeek();
         }
 
         $weekStartFormatted = $weekStartDate->format('Y-m-d');
 
-        // Vérifier si la semaine est déjà configurée
         $existingWeek = Semaine::where('date_debut', $weekStartFormatted)->first();
         if ($existingWeek) {
             return redirect()->back()->with('error', 'Cette semaine est déjà configurée')->withInput();
         }
 
-        // Création de la semaine et des jours
         $semaine = Semaine::create(['date_debut' => $weekStartFormatted]);
 
         $jours = [
@@ -166,12 +157,9 @@ class MenuController extends Controller
         $menus = $request->input('menus');
 
         $today = Carbon::today();
-         // Déterminer la semaine à configurer
          if ($today->isFriday() || $today->isSaturday() || $today->isSunday()) {
-            // Afficher les jours pour la semaine après celle-ci
             $startOfNextWeek = $today->copy()->addWeeks(2)->startOfWeek();
         } else {
-            // Afficher les jours pour la semaine prochaine
             $startOfNextWeek = $today->copy()->addWeeks(1)->startOfWeek();
         }
 
