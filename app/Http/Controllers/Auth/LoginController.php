@@ -18,13 +18,14 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    // Affiche le formulaire de connexion
+
     public function showLoginForm()
     {
+        
       return redirect('/connexion');
     }
 
-    // Gère la déconnexion
+
     public function logout(Request $request)
     {
         $this->guard()->logout();
@@ -33,7 +34,9 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/connexion'); // Redirige vers la page de connexion après déconnexion
+        return redirect('/connexion');
+
+
     }
     protected function credentials(Request $request)
     {

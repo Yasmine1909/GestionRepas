@@ -19,6 +19,23 @@
     }
     .table th, .table td {
         text-align: center;
+        color: #0d4a75;
+
+    }
+    h1 {
+        color: #0d4a75;
+        font-weight: bold;
+        font-size: 2.5rem;
+    }
+    h2 {
+        color: #0d4a75;
+        font-weight: bold;
+        font-size: 2.5rem;
+    }
+    h5 {
+        color: #0d4a75;
+        font-weight: bold;
+        font-size: 1.5rem;
     }
 </style>
 <br>
@@ -52,7 +69,7 @@
             <div class="stat-card">
                 <h5>Non Disponibles</h5>
                 <span id="totalNotAvailableReservations" class="display-4">0</span>
-                <button class="btn btn-warning btn-block mb-2" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
+                <button class="btn btn-warning btn-block mb-2 text-white" id="downloadNotAvailableList">Télécharger la Liste en PDF</button>
             </div>
         </div>
         <div class="col-md-4">

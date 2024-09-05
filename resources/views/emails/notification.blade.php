@@ -46,7 +46,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Notification de Confirmation</h1>
+            <h1>
+                @if($notification->type === 'danger')
+                    Notification d'Annulation
+                @else
+                    Notification de Confirmation
+                @endif
+            </h1>
         </div>
         <div class="content">
             <p>{{ $notification->message }}</p>

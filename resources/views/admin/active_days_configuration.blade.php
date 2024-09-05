@@ -1,13 +1,13 @@
 @extends('BackOffice.layouts.app')
 
 @section('content')
-<br><br<<br><br><br><br>
+<br><br><br><br><br><br>
 <main id="main" class="py-5">
 
-
+    <!-- Container -->
     <div class="container">
 
-
+        <!-- Success Alert -->
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -15,9 +15,17 @@
             </div>
         @endif
 
+        <!-- Error Alert -->
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
+        <!-- Card -->
         <div class="card shadow-sm border-light">
-            <div class="card-header  text-white" style="background-color: #0d4a75">
+            <div class="card-header text-white" style="background-color: #0d4a75">
                 <h4 class="mb-0 text-white">Configuration des Jours Actifs</h4>
             </div>
             <div class="card-body">

@@ -1,12 +1,8 @@
-
 @extends('FrontOffice/layouts.app')
-
 
 @section('content')
 
-
-
-
+  <!-- ======= Hero Section ======= -->
   <section id="hero">
     <div class="hero-container">
         <div id="heroCarousel" data-bs-interval="5000" class="carousel slide carousel-fade" data-bs-ride="carousel">
@@ -18,9 +14,9 @@
               <div class="carousel-item active" style="background-image: url('{{ asset('M2M/img/accueil.jpg') }}');">
                 <div class="carousel-container">
                   <div class="carousel-content">
-                    <h2 class="animate__animated animate__fadeInDown"><span>Réservez vos repas pour la semaine à venir</span> </h2>
+                    <h2 class="animate_animated animate_fadeInDown"><span>Réservez vos repas pour la semaine à venir</span> </h2>
                     <div>
-                      <a href="Dashboard" class="btn-book animate__animated animate__fadeInUp scrollto">Réservez</a>
+                      <a href="Dashboard" class="btn-book animate_animated animate_fadeInUp scrollto">Réservez</a>
                     </div>
                   </div>
                 </div>
@@ -30,18 +26,18 @@
           </div>
 
     </div>
-  </section>
+  </section><!-- End Hero -->
 
   <main id="main">
 
-
+    <!-- ======= About Section ======= -->
     <section id="about" class="about">
       <div class="container-fluid">
 
         <div class="row">
 
-          <div class="col-lg-5 align-items-stretch video-box" style='background-image: url("{{ asset('M2M/img/about.jpg') }}");'>
-            <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="glightbox play-btn mb-4"></a>
+          <div class="col-lg-5 align-items-stretch image-box" style='background-image: url("{{ asset('M2M/img/about.jpg') }}");'>
+            <!-- Remove video link -->
           </div>
 
           <div class="col-lg-7 d-flex flex-column justify-content-center align-items-stretch">
@@ -58,20 +54,13 @@
                 <p>Notre plateforme permet aux employés de réserver leurs repas en toute simplicité, assurant une gestion efficace et une expérience utilisateur optimale.</p>
             </div>
 
-
           </div>
 
         </div>
 
       </div>
-    </section>
+    </section><!-- End About Section -->
 
-
-
-
-
-  </main>
-
-
+  </main><!-- End #main -->
 
 @endsection

@@ -10,10 +10,20 @@
         color: grey;
         font-style: italic;
     }
+    /* Changer la couleur du texte globalement */
+    body {
+        color: #0d4a75;
+    }
+
+    /* Si vous voulez cibler seulement certaines sections */
+    .week-title, .table-title, .search-bar, .table td, .table th {
+        color: #0d4a75;
+    }
 </style>
 
 <div class="container" style="margin-top:15%;">
     <h1 class="table-title text-center">Tableau de Bord des Menus</h1>
+    <!-- Formulaire de Recherche -->
     <div class="search-bar">
         <form id="searchForm" class="form-inline">
             <input type="date" id="searchDate" class="form-control mr-2" placeholder="Rechercher par date">
@@ -89,13 +99,13 @@
     </div>
     @endforeach
 
+    <div class="pagination" style="justify-content: center;">
+        {{ $weeks->links('vendor.pagination.customm') }}
+    </div>
 
-<div class="pagination" style="justify-content: center;">
-    {{ $weeks->links('vendor.pagination.customm') }}
 </div>
 
-</div>
-
+<!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

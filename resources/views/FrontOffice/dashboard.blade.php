@@ -95,15 +95,17 @@
         transition: background-color 0.3s;
     }
     .btn-custom, .reserve-week-btn {
-        position: absolute;
-    bottom: 10px; /* Ajustez selon vos besoins */
-    right: 1140px;  /* Ajustez selon vos besoins */
+        /* position: relative; */
+    /* bottom: 10px; /* Ajustez selon vos besoins */
+    /* right: 1140px;  Ajustez selon vos besoins */
     background-color: #0056b3;
     color: #ffffff;
     border: none;
     padding: 10px 20px;
     border-radius: 50px;
     transition: background-color 0.3s;
+    margin-right: 80px; /* Espace entre le bouton et les icônes */
+    margin-left:100px;
     }
     .reserve-week-btn:hover {
         background-color: #007bff;
@@ -192,10 +194,15 @@
     .btn-success-custom:hover {
         background-color: #218838;
     }
+    .icon-list {
+    display: flex;
+    gap: 20px; /* Espacement entre chaque icône */
+}
     .icon-legend {
         display: flex;
         justify-content: center;
         margin-top: 20px;
+        justify-content: flex-start;
     }
     .icon-legend div {
         margin: 0 15px;
@@ -205,6 +212,11 @@
         font-size: 24px;
         margin-bottom: 5px;
     }
+    .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
     .calendar .weekend {
     background-color: #7f8f9e; /* Gris foncé */
     color: #ffffff;
@@ -237,7 +249,7 @@
 <div class="header">Ven</div>
 <div class="header ">Sam</div>
 <div class="header ">Dim</div>
-<div class="header">Télécharger</div>
+<div class="header">Télécharger Le Menu</div>
 
 
 @foreach ($calendarDays->chunk(8) as $week)
@@ -273,25 +285,26 @@
 
             $icon = '';
             if ($isReserved) {
-                if ($reservation->status === 'available') {
-                    $icon = '<i class="fas fa-check-circle mt-1" style="color: green;"></i>';
-                } elseif ($reservation->status === 'unavailable') {
-                    switch ($reservation->reason) {
-                        case 'Déplacement':
-                            $icon = '<i class="fas fa-car mt-1" style="color: rgb(97, 74, 4);"></i>';
-                            break;
-                        case 'Congé':
-                            $icon = '<i class="fas fa-umbrella-beach mt-1" style="color: rgb(97, 74, 4);"></i>';
-                            break;
-                        case 'Régime':
-                            $icon = '<i class="fas fa-apple-alt mt-1" style="color: rgb(97, 74, 4);"></i>';
-                            break;
-                        default:
-                            $icon = '<i class="fas fa-times-circle mt-1" style="color: gray;"></i>';
-                            break;
-                    }
-                }
-            }
+    if ($reservation->status === 'available') {
+        $icon = '<i class="fas fa-check-circle mt-1 fa-2x" style="color: green;"></i>'; // Taille agrandie à 2x
+    } elseif ($reservation->status === 'unavailable') {
+        switch ($reservation->reason) {
+            case 'Déplacement':
+                $icon = '<i class="fas fa-car mt-1 fa-2x" style="color: rgb(97, 74, 4);"></i>'; // Taille agrandie à 2x
+                break;
+            case 'Congé':
+                $icon = '<i class="fas fa-umbrella-beach mt-1 fa-2x" style="color: rgb(97, 74, 4);"></i>'; // Taille agrandie à 2x
+                break;
+            case 'Régime':
+                $icon = '<i class="fas fa-apple-alt mt-1 fa-2x" style="color: rgb(97, 74, 4);"></i>'; // Taille agrandie à 2x
+                break;
+            default:
+                $icon = '<i class="fas fa-times-circle mt-1 fa-2x" style="color: gray;"></i>'; // Taille agrandie à 2x
+                break;
+        }
+    }
+}
+
         @endphp
         <div class="{{ $dayClass }}"
             data-date="{{ $dateString }}"
@@ -323,29 +336,32 @@
 
     </div>
     <div class="icon-legend">
-        <div>
-            <i class="fas fa-check-circle" style="color: green;"></i>
-            <div>Disponible</div>
-        </div>
-        <div>
-            <i class="fas fa-umbrella-beach" style="color: rgb(97, 74, 4);"></i>
-            <div>Congé</div>
-        </div>
-        <div>
-            <i class="fas fa-car" style="color: rgb(97, 74, 4);"></i>
-            <div>Déplacement</div>
-        </div>
-        <div>
-            <i class="fas fa-apple-alt" style="color: rgb(97, 74, 4);"></i>
-            <div>Régime</div>
-        </div>
+        <button class="reserve-week-btn" id="reserveWeekBtn">Réserver Toute La Semaine</button>
 
+        <div class="icon-list">
+            <div class="icon-item">
+                <i class="fas fa-check-circle" style="color: green;"></i>
+                <div>Disponible</div>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-umbrella-beach" style="color: rgb(97, 74, 4);"></i>
+                <div>Congé</div>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-car" style="color: rgb(97, 74, 4);"></i>
+                <div>Déplacement</div>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-apple-alt" style="color: rgb(97, 74, 4);"></i>
+                <div>Régime</div>
+            </div>
+        </div>
     </div>
+
 
 </div>
 
 
-<button class="reserve-week-btn" id="reserveWeekBtn"><i class="fas fa-list-check"></i></button>
 <div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="menuModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -437,6 +453,14 @@
           }
       });
 
+      $('#notAvailableRadio ').on('click', function() {
+            // Modifier le texte du bouton "Réserver" en "Valider"
+            $('#reserveBtn').text('Valider');
+        });
+        $('#availableRadio ').on('click', function() {
+            // Modifier le texte du bouton "Réserver" en "Valider"
+            $('#reserveBtn').text('Réserver');
+        });
 
       $('#reserveBtn').on('click', function() {
           var date = $('#menuDate').text();

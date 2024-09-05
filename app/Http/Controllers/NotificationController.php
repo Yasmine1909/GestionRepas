@@ -13,23 +13,27 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationMail;
 
-use App\Models\Semaine;
-
 class NotificationController extends Controller
 {
     public function index()
     {
         if (Auth::check()) {
-        $this->middleware('auth');
-        $userId = Auth::id();
-        $notifications = Notification::where('user_id', $userId)
-                                    ->orderBy('created_at', 'desc')
-                                    ->paginate(20);
+            $this->middleware('auth');
+            $userId = Auth::id();
+            $notifications = Notification::where('user_id', $userId)
+                                        ->orderBy('created_at', 'desc')
+                                        ->paginate(20);  // Pagination avec 20 notifications par page
 
-        return view('FrontOffice.notifications', compact('notifications'));
-    } else {
-        return redirect()->route('login');
-    }
+            // Obtenir le nombre de notifications non lues
+            $unreadCount = Notification::where('user_id', $userId)
+                                       ->where('is_read', false)
+                                       ->count();
+
+            return view('FrontOffice.notifications', compact('notifications', 'unreadCount'));
+        } else {
+            // Rediriger ou gérer les utilisateurs non connectés
+            return redirect()->route('login');
+        }
     }
 
     public function storeReservationNotification($reservationId)
@@ -62,10 +66,9 @@ class NotificationController extends Controller
             'message' => $message
         ]);
 
+        // Envoi de l'email
         Mail::to($reservation->user->email)->send(new NotificationMail($notification));
     }
-
-
 
     public function storeCancellationNotification($reservationId)
     {
@@ -87,6 +90,7 @@ class NotificationController extends Controller
 
             Log::info('Notification d\'annulation créée avec succès : ' . $notification->id);
 
+            // Envoi de l'email
             Mail::to($reservation->user->email)->send(new NotificationMail($notification));
 
             Log::info('Email d\'annulation envoyé avec succès à : ' . $reservation->user->email);
@@ -94,30 +98,53 @@ class NotificationController extends Controller
             Log::error('Erreur lors de la création de la notification ou de l\'envoi de l\'email : ' . $e->getMessage());
         }
     }
+
     public function search(Request $request)
-{
-    if (!Auth::check()) {
-        return redirect()->route('login');
+    {
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $userId = Auth::id(); // Obtenir l'ID de l'utilisateur connecté
+        $query = $request->input('query');
+
+        // Filtrer les notifications de l'utilisateur connecté et par recherche
+        $notifications = Notification::where('user_id', $userId)
+                                      ->where(function($q) use ($query) {
+                                          $q->where('message', 'LIKE', "%$query%")
+                                            ->orWhereDate('created_at', 'LIKE', "%$query%");
+                                      })
+                                      ->orderBy('created_at', 'desc')
+                                      ->paginate(20);
+
+        return view('FrontOffice.notifications', compact('notifications'));
     }
 
-    $userId = Auth::id();
-    $query = $request->input('query');
+    public function count()
+    {
+        if (Auth::check()) {
+            $userId = Auth::id();
+            // Compter les notifications non lues
+            $unreadCount = Notification::where('user_id', $userId)
+                                       ->where('is_read', false)
+                                       ->count();
+            return response()->json(['count' => $unreadCount]);
+        }
+        return response()->json(['count' => 0]);
+    }
 
-    $notifications = Notification::where('user_id', $userId)
-                                  ->where(function($q) use ($query) {
-                                      $q->where('message', 'LIKE', "%$query%")
-                                        ->orWhereDate('created_at', 'LIKE', "%$query%");
-                                  })
-                                  ->orderBy('created_at', 'desc')
-                                  ->paginate(20);
+    public function markAsRead(Request $request)
+    {
+        if (Auth::check()) {
+            $userId = Auth::id();
+            // Marquer toutes les notifications comme lues pour l'utilisateur connecté
+            Notification::where('user_id', $userId)
+                        ->where('is_read', false)
+                        ->update(['is_read' => true]);
 
-    return view('FrontOffice.notifications', compact('notifications'));
+            return response()->json(['status' => 'success']);
+        }
+        return response()->json(['status' => 'error']);
+    }
 }
-
-
-
-
-}
-
-
-

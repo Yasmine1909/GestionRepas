@@ -89,7 +89,7 @@ public function update(Request $request, $id)
     $plat->titre = $request->input('titre');
     $plat->save();
 
-    return redirect()->back()->with('success', 'Menu mis à jour avec succès!');
+    return redirect()->route('menus')->with('success', 'Menu mis à jour avec succès!');
 }
 
 public function destroy($id)

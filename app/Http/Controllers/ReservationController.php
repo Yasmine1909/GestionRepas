@@ -26,6 +26,7 @@ class ReservationController extends Controller
 
     public function index()
     {
+        
         if (Auth::check()) {
             $now = Carbon::now();
             $currentDayOfWeek = $now->dayOfWeek;

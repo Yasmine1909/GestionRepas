@@ -14,6 +14,7 @@ use App\Mail\NotificationMail;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ReservationStatsController;
 use App\Http\Controllers\AdminLoginController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,16 +24,16 @@ use App\Http\Controllers\AdminLoginController;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-// */
+*/
 
 // Route pour la page de connexion
 Route::get('connexion', [ShowController::class, 'connexion'])->name('connexion');
 
 // Route pour la page de connexion admin
-
 Route::get('admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('admin/login', [AdminLoginController::class, 'login']);
 Route::post('admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
+
 // Authentification
 Auth::routes();
 
@@ -72,14 +73,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download-not-available-pdf', [ReservationStatsController::class, 'downloadNotAvailablePdf']);
     Route::get('/download-no-response-pdf', [ReservationStatsController::class, 'downloadNoResponsePdf']);
 
-
+    // Routes pour les notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::get('/notifications/search', [NotificationController::class, 'search'])->name('notifications.search');
-
-
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark_as_read');
+    Route::get('/notifications/count', [NotificationController::class, 'count'])->name('notifications.count');
 
 });
-
-
-
-

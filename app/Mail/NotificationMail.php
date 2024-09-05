@@ -1,4 +1,6 @@
 <?php
+
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -29,7 +31,13 @@ class NotificationMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.notification')
-                    ->with('notification', $this->notification);
+        $subject = $this->notification->type === 'success'
+            ? 'Notification de Confirmation'
+            : 'Notification d\'Annulation';
+
+        return $this
+            ->view('emails.notification')
+            ->with('notification', $this->notification)
+            ->subject($subject);
     }
 }
