@@ -98,7 +98,7 @@
 
     <div class="row mt-4">
         <div class="col-md-12">
-            <h2 class="text-center mb-4">Historique des Semaines</h2>
+            <h2 class="text-center mb-4">Réservations Par Semaine </h2>
             <table class="table">
                 <thead>
                     <tr>

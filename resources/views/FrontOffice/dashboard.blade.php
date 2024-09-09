@@ -221,6 +221,11 @@
     background-color: #7f8f9e; /* Gris foncé */
     color: #ffffff;
 }
+.btn-disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
+
 
 </style>
 
@@ -337,6 +342,7 @@
     </div>
     <div class="icon-legend">
         <button class="reserve-week-btn" id="reserveWeekBtn">Réserver Toute La Semaine</button>
+        <div id="processingMessage" class="alert alert-info" style="display: none;">Votre Opération est en cours veuillez attendre...</div>
 
         <div class="icon-list">
             <div class="icon-item">
@@ -406,6 +412,7 @@
 
 
 <script>
+    let isProcessing = false;
     $(document).ready(function() {
       $('.clickable').on('click', function() {
           var date = $(this).data('date');
@@ -522,7 +529,9 @@
           });
       });
 
-      $('#reserveWeekBtn').on('click', function() {
+$('#reserveWeekBtn').on('click', function() {
+    var $button = $(this);
+    var $message = $('#processingMessage');
     var reservableDays = [];
 
     $('.calendar .clickable.reservable-week').each(function() {
@@ -537,39 +546,55 @@
     });
 
     if (reservableDays.length > 0) {
-        $.ajax({
-            url: '{{ route('reserve.week') }}',
-            type: 'POST',
-            data: {
-                days: reservableDays,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                if (response.success) {
+        // Griser le bouton et afficher le message
+        $button.prop('disabled', true).addClass('btn-disabled'); // Ajouter la classe CSS
+        $message.show();
 
-                    reservableDays.forEach(function(day) {
-                        $('.calendar .clickable[data-date="' + day.date + '"]').addClass('reserved');
-                    });
-                    alert('Tous les jours disponibles pour la semaine ont été réservés.');
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    alert('Erreur lors de la réservation de la semaine.');
+        // Simuler une opération asynchrone (par exemple, une requête AJAX)
+        setTimeout(function() {
+            $.ajax({
+                url: '{{ route('reserve.week') }}',
+                type: 'POST',
+                data: {
+                    days: reservableDays,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        reservableDays.forEach(function(day) {
+                            $('.calendar .clickable[data-date="' + day.date + '"]').addClass('reserved');
+                        });
+                        alert('Tous les jours disponibles pour la semaine ont été réservés.');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert('Erreur lors de la réservation de la semaine.');
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = 'Erreur lors de la réservation.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    alert(errorMsg);
+                },
+                complete: function() {
+                    // Remettre le bouton dans son état initial et masquer le message
+                    $button.prop('disabled', false).removeClass('btn-disabled'); // Retirer la classe CSS
+                    $message.hide();
                 }
-            },
-            error: function(xhr) {
-                var errorMsg = 'Erreur lors de la réservation.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                alert(errorMsg);
-            }
-        });
+            });
+        }, 2000); // Simule un délai de 2 secondes pour l'opération
     } else {
         alert('Aucun jour disponible à réserver pour cette semaine.');
+        // Remettre le bouton dans son état initial et masquer le message
+        $button.prop('disabled', false).removeClass('btn-disabled'); // Retirer la classe CSS
+        $message.hide();
     }
 });
+
+
 
 
 
