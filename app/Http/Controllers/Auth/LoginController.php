@@ -12,6 +12,10 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     protected $redirectTo = '/'; // Redirige après connexion réussie
+    protected function authenticated(Request $request, $user)
+    {
+        return redirect()->intended('/'); // ou la route de ton choix
+    }
 
     public function __construct()
     {
@@ -21,7 +25,7 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        
+
       return redirect('/connexion');
     }
 

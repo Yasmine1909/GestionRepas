@@ -40,7 +40,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Statistiques des Réservations</h1>
+        <h1>Réservations De La Semaine</h1>
         <div class="week-info">
             <p>Semaine du {{ \Carbon\Carbon::parse($week->date_debut)->format('d/m/Y') }}</p>
         </div>

@@ -24,6 +24,29 @@ class AdminLoginController extends Controller
     {
         return view('auth.admin-login');
     }
+    public function login(Request $request)
+    {
+        $this->validateLogin($request);
+
+        $authorizedEmails = [
+            'ykhatib@m2mgroup.com',
+            'admin@example.com',
+            'admin2@example.com',
+        ];
+        $email = strtolower($request->email);
+
+        if (!in_array($email, $authorizedEmails)) {
+            return redirect()->back()->withErrors(['email' => 'Cet utilisateur n\'a pas accès à l\'interface admin.']);
+        }
+
+
+        if (Auth::attempt($this->credentials($request))) {
+            return redirect()->intended($this->redirectTo);
+        }
+
+
+        return redirect()->back()->withErrors(['email' => 'Identifiants incorrects.']);
+    }
 
 
 
