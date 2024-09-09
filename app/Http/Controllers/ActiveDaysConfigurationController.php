@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ActiveDaysConfiguration;
 use Illuminate\Support\Facades\Auth;
+use App\Models\EmailSetting;
 
 class ActiveDaysConfigurationController extends Controller
 {
@@ -13,12 +14,17 @@ class ActiveDaysConfigurationController extends Controller
         if (Auth::check()) {
             $configuration = ActiveDaysConfiguration::first();
             $activeDays = $configuration ? $configuration->active_days : [];
-            return view('admin.active_days_configuration', compact('activeDays'));
+
+            // Ajoutez cette ligne pour récupérer l'email setting
+            $emailSetting = EmailSetting::first() ?? EmailSetting::create(['enabled' => false]);
+
+            return view('admin.active_days_configuration', compact('activeDays', 'emailSetting'));
         } else {
             // Rediriger ou gérer les utilisateurs non connectés
             return redirect()->route('login');
         }
     }
+
 
     public function saveConfiguration(Request $request)
     {

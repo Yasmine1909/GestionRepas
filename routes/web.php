@@ -14,6 +14,7 @@ use App\Mail\NotificationMail;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ReservationStatsController;
 use App\Http\Controllers\AdminLoginController;
+use App\Http\Controllers\EmailSettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,8 +45,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('menu', [ShowController::class, 'menu']);
     Route::get('menus', [ShowController::class, 'menus'])->name('menus');
     Route::post('store', [MenuController::class, 'store'])->name('store');
-    Route::get('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'showConfigurationForm'])->name('admin.active_days_configuration');
-    Route::post('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'saveConfiguration'])->name('admin.save_active_days_configuration');
+
     Route::get('/admin/ajouter-menu', [MenuController::class, 'showWeeklyMenuForm'])->name('admin.show_weekly_menu_form');
     Route::post('/admin/store-weekly-menu', [MenuController::class, 'storeWeeklyMenu'])->name('admin.store_weekly_menu');
     Route::get('modifier_menu/{id}', [ShowController::class, 'modifier_menu'])->name('modifier_menu');
@@ -80,5 +80,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount']);
 Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);
 
+
+Route::get('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'showConfigurationForm'])->name('admin.active_days_configuration');
+Route::post('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'saveConfiguration'])->name('admin.save_active_days_configuration');
+Route::get('email-settings/edit', [EmailSettingController::class, 'edit'])->name('email.settings.edit');
+Route::put('email-settings/update', [EmailSettingController::class, 'update'])->name('email.settings.update');
 
 });

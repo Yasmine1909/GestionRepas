@@ -23,8 +23,8 @@
             </div>
         @endif
 
-        <!-- Card -->
-        <div class="card shadow-sm border-light">
+        <!-- Card for Active Days Configuration -->
+        <div class="card shadow-sm border-light mb-4">
             <div class="card-header text-white" style="background-color: #0d4a75">
                 <h4 class="mb-0 text-white">Configuration des Jours Actifs</h4>
             </div>
@@ -46,6 +46,37 @@
                 </form>
             </div>
         </div>
+
+<!-- Card for Email Configuration -->
+<div class="card shadow-sm border-light mb-4">
+    <div class="card-header text-white" style="background-color: #0d4a75">
+        <h4 class="mb-0 text-white">Configurer l'Envoi des Emails</h4>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('email.settings.update') }}" method="post">
+            @csrf
+            @method('PUT')
+            <div class="form-group mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="activer" name="email_setting" value="1"
+                    {{ $emailSetting->enabled ? 'checked' : '' }}>
+                <label class="form-check-label" for="activer">Activer</label>
+
+                </div>
+                <div class="form-check">
+
+                <input class="form-check-input" type="radio" id="desactiver" name="email_setting" value="0"
+                {{ !$emailSetting->enabled ? 'checked' : '' }}>
+            <label class="form-check-label" for="desactiver">Désactiver</label>
+
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Enregistrer</button>
+        </form>
+    </div>
+</div>
+
+
 
     </div>
     <!-- End Container -->

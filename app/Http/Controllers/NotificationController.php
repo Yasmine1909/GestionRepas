@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationMail;
-
+use App\Models\EmailSetting;
 class NotificationController extends Controller
 {
     public function index()
@@ -70,7 +70,11 @@ class NotificationController extends Controller
             'is_read' => false
         ]);
 
-        Mail::to($reservation->user->email)->send(new NotificationMail($notification));
+        // Vérifiez si l'envoi des emails est activé
+        $emailSetting = EmailSetting::first();
+        if ($emailSetting && $emailSetting->enabled) {
+            Mail::to($reservation->user->email)->send(new NotificationMail($notification));
+        }
     }
 
     public function storeCancellationNotification($reservationId)

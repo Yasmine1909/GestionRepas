@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationMail;
+use App\Models\EmailSetting;
 
 class ReservationController extends Controller
 {
@@ -26,7 +27,7 @@ class ReservationController extends Controller
 
     public function index()
     {
-        
+
         if (Auth::check()) {
             $now = Carbon::now();
             $currentDayOfWeek = $now->dayOfWeek;
@@ -150,7 +151,13 @@ class ReservationController extends Controller
                     'message' => 'Votre réservation pour le ' . $date->format('d-m-Y') . ' a été annulée.'
                 ]);
 
-                Mail::to($reservation->user->email)->send(new NotificationMail($notification));
+
+                        // Vérifiez si l'envoi des emails est activé
+                $emailSetting = EmailSetting::first();
+                if ($emailSetting && $emailSetting->enabled) {
+                    Mail::to($reservation->user->email)->send(new NotificationMail($notification));
+                }
+
 
                 Log::info('Réservation annulée et email envoyé avec succès à ' . $reservation->user->email);
                 return response()->json(['message' => 'Réservation annulée avec succès'], 200);
