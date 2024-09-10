@@ -26,7 +26,8 @@ class SendReservationReminder implements ShouldQueue
 
     public function handle()
     {
-        $users = User::all(); 
+        set_time_limit(700);
+        $users = User::all();
 
         foreach ($users as $user) {
             Mail::to($user->email)->send(new ReservationReminderMail());

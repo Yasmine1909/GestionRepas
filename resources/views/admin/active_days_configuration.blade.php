@@ -75,6 +75,64 @@
         </form>
     </div>
 </div>
+<!-- Card for Reminder Emails -->
+<div class="card shadow-sm border-light mb-4">
+    <div class="card-header text-white" style="background-color: #0d4a75">
+        <h4 class="mb-0 text-white">Envoyer un Rappel par Email</h4>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('admin.send_reminder_emails') }}" method="post">
+            @csrf
+            <!-- Type de rappel -->
+            <div class="form-group mb-4">
+                <label for="reminder_type">Type de Rappel :</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="premier_rappel" name="reminder_type" value="premier_rappel" checked>
+                    <label class="form-check-label" for="premier_rappel">Premier Rappel</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="dernier_rappel" name="reminder_type" value="dernier_rappel">
+                    <label class="form-check-label" for="dernier_rappel">Dernier Rappel</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="autre" name="reminder_type" value="autre">
+                    <label class="form-check-label" for="autre">Message Personnalisé</label>
+                </div>
+            </div>
+
+            <!-- Message personnalisé -->
+            <div class="form-group mb-4" id="custom_message_block" style="display: none;">
+                <label for="custom_message">Message Personnalisé :</label>
+                <textarea class="form-control" id="custom_message" name="custom_message" rows="3" placeholder="Tapez votre message personnalisé ici..."></textarea>
+            </div>
+
+            <!-- Bouton d'envoi -->
+            <button type="submit" class="btn btn-primary btn-lg">Envoyer le Rappel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Script pour afficher/masquer le champ de message personnalisé -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const customMessageBlock = document.getElementById('custom_message_block');
+        const customRadio = document.getElementById('autre');
+
+        customRadio.addEventListener('change', function () {
+            if (customRadio.checked) {
+                customMessageBlock.style.display = 'block';
+            }
+        });
+
+        document.getElementById('premier_rappel').addEventListener('change', function () {
+            customMessageBlock.style.display = 'none';
+        });
+
+        document.getElementById('dernier_rappel').addEventListener('change', function () {
+            customMessageBlock.style.display = 'none';
+        });
+    });
+</script>
 
 
 

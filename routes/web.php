@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ReservationStatsController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\EmailSettingController;
+use App\Http\Controllers\EmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,5 +86,8 @@ Route::get('/admin/active-days-configuration', [ActiveDaysConfigurationControlle
 Route::post('/admin/active-days-configuration', [ActiveDaysConfigurationController::class, 'saveConfiguration'])->name('admin.save_active_days_configuration');
 Route::get('email-settings/edit', [EmailSettingController::class, 'edit'])->name('email.settings.edit');
 Route::put('email-settings/update', [EmailSettingController::class, 'update'])->name('email.settings.update');
+
+
+Route::post('/admin/send-reminder-emails', [EmailController::class, 'sendReminderEmails'])->name('admin.send_reminder_emails');
 
 });
