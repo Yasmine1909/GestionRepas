@@ -20,7 +20,7 @@ class SendReminderEmail implements ShouldQueue
         $this->message = $message;
     }
     //Laisser pour après POur pouvoir envoyer à tout le Monde
-    
+
     // public function handle()
     //  $users = User::all();
     // {
@@ -40,7 +40,7 @@ class SendReminderEmail implements ShouldQueue
     foreach ($specificEmails as $email) {
         Mail::raw($this->message, function ($mail) use ($email) {
             $mail->to($email)
-                ->subject('Rappel de Disponibilité');
+                ->subject('Rappel de Disponibilité pour la Restauration');
         });
     }
 }
