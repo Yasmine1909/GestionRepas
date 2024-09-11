@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -18,7 +17,6 @@ class UserController extends Controller
 
         // Import users from the uploaded Excel file
         try {
-            // Use the UsersImport class to handle the import
             $filePath = $request->file('users_excel')->getRealPath();
             $importer = new UsersImport();
             $importer->import($filePath);
@@ -29,4 +27,3 @@ class UserController extends Controller
         }
     }
 }
-

@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Imports;
 
 use App\Models\User;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Log;
 
 class UsersImport
 {
+
     public function import($filePath)
     {
         // Load the Excel file
@@ -16,18 +18,29 @@ class UsersImport
         $worksheet = $spreadsheet->getActiveSheet();
         $rows = $worksheet->toArray(null, true, true, true);
 
-        // Check if the header row exists and extract column names
+        // Extract the column mappings (header row)
         $header = array_shift($rows); // Remove and get the header row
-        $emailColumn = array_search('email', array_map('strtolower', $header)); // Find the email column
+        $emailColumn = array_search('email', array_map('strtolower', $header));
+        $typeColumn = array_search('type', array_map('strtolower', $header)); // Find the type column
 
-        if ($emailColumn === false) {
-            throw new \Exception('No "email" column found in the provided Excel file.');
+        if ($emailColumn === false || $typeColumn === false) {
+            throw new \Exception('Les colonnes "email" ou "type" sont manquantes dans le fichier Excel.');
         }
 
-        // Collect emails from the file, convert to lowercase
+        // Process each row from the file
         $emailsFromFile = [];
         foreach ($rows as $row) {
             $email = isset($row[$emailColumn]) ? strtolower(trim($row[$emailColumn])) : null;
+            $type = isset($row[$typeColumn]) ? strtolower(trim($row[$typeColumn])) : 'user';
+
+            // Log the values for debugging
+            Log::info("Email: $email, Type from file: $type");
+
+            // Validate type, default to 'user' if type is invalid
+            if (!in_array($type, ['user', 'admin'])) {
+                $type = 'user'; // Ensure default
+            }
+
             if ($email) {
                 $emailsFromFile[] = $email;
 
@@ -36,9 +49,10 @@ class UsersImport
 
                 if ($ldapUser) {
                     $objectGuid = $ldapUser->getConvertedGuid();
-                    // Create or update the local user with information from LDAP
-                    User::updateOrCreate(
-                        ['email' => $email],
+
+                    // Ensure we update or create the local user with the correct "type"
+                    $localUser = User::updateOrCreate(
+                        ['email' => $email], // Lookup by email
                         [
                             'id' => $objectGuid,
                             'name' => $ldapUser->cn[0] ?? 'Unknown',
@@ -46,11 +60,23 @@ class UsersImport
                             'password' => bcrypt(Str::random(16)),
                         ]
                     );
+
+                    // Log the current type before update
+                    Log::info("User email: $email, Previous type: {$localUser->type}");
+
+                    // Explicitly update the "type" after creation or update
+                    $localUser->type = $type;
+                    $localUser->save();
+
+                    // Log after update
+                    Log::info("User email: $email, Updated type: {$localUser->type}");
                 }
             }
         }
 
-        // Delete users not present in the imported file, using lowercase comparison
+        // Optionally delete users not in the file
         User::whereNotIn('email', $emailsFromFile)->delete();
     }
+
+
 }
