@@ -110,6 +110,23 @@
             <button type="submit" class="btn btn-primary btn-lg">Envoyer le Rappel</button>
         </form>
     </div>
+
+    <!-- Card for Importing Users from Excel -->
+</div>
+<div class="card shadow-sm border-light mb-4">
+    <div class="card-header text-white" style="background-color: #0d4a75">
+        <h4 class="mb-0 text-white">Importer des Utilisateurs depuis un Fichier Excel</h4>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('admin.import_users') }}" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="form-group mb-4">
+                <label for="users_excel">Fichier Excel :</label>
+                <input type="file" class="form-control" id="users_excel" name="users_excel" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Importer</button>
+        </form>
+    </div>
 </div>
 
 <!-- Script pour afficher/masquer le champ de message personnalisé -->

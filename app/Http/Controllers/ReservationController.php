@@ -45,7 +45,6 @@ class ReservationController extends Controller
 
             $userId = Auth::id();
             $reservations = Reservation::where('user_id', $userId)->get();
-            $reservations = Reservation::all();
             $jours = Jour::whereBetween('date', [$startOfDisplayWeek, $endOfDisplayWeek])
                 ->with('plats')
                 ->get()

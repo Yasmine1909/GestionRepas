@@ -16,6 +16,9 @@ use App\Http\Controllers\ReservationStatsController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\EmailSettingController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\Admin\UserController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -89,5 +92,9 @@ Route::put('email-settings/update', [EmailSettingController::class, 'update'])->
 
 
 Route::post('/admin/send-reminder-emails', [EmailController::class, 'sendReminderEmails'])->name('admin.send_reminder_emails');
+
+//Import Des Users
+Route::post('/admin/import-users', [UserController::class, 'importUsers'])->name('admin.import_users');
+
 
 });

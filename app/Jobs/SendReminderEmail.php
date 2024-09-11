@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Models\User;
@@ -8,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log; // Import Log facade
 
 class SendReminderEmail implements ShouldQueue
 {
@@ -19,30 +21,28 @@ class SendReminderEmail implements ShouldQueue
     {
         $this->message = $message;
     }
-    //Laisser pour après POur pouvoir envoyer à tout le Monde
-
-    // public function handle()
-    //  $users = User::all();
-    // {
-
-    //     foreach ($users as $user) {
-    //         Mail::raw($this->message, function ($mail) use ($user) {
-    //             $mail->to($user->email)
-    //                 ->subject('Rappel de Disponibilité');
-    //         });
-    //     }
-    // }
 
     public function handle()
-{
-    $specificEmails = ['ykhatib@m2mgroup.com', 'omersoul@m2mgroup.com'];
+    {
+        $specificEmails = ['ykhatib@m2mgroup.com', 'omersoul@m2mgroup.com'];
 
-    foreach ($specificEmails as $email) {
-        Mail::raw($this->message, function ($mail) use ($email) {
-            $mail->to($email)
-                ->subject('Rappel de Disponibilité pour la Restauration');
-        });
+        foreach ($specificEmails as $email) {
+            // Log the email sending attempt
+            Log::info("Attempting to send reminder email to: $email");
+
+            try {
+                Mail::raw($this->message, function ($mail) use ($email) {
+                    $mail->to($email)
+                        ->subject('Rappel de Disponibilité pour la Restauration');
+                });
+
+                // Log successful email sending
+                Log::info("Successfully sent reminder email to: $email");
+
+            } catch (\Exception $e) {
+                // Log any errors that occur during sending
+                Log::error("Failed to send reminder email to: $email. Error: " . $e->getMessage());
+            }
+        }
     }
-}
-
 }
